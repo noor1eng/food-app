@@ -15,9 +15,10 @@ import {
   Plus,
   Icon,
 } from "lucide-react";
-import Navbar from "../Navbar";
+import Navbar from "../../Navbar";
 import Link from "next/link";
 import axios from "axios";
+import Image from "next/image";
 
 const CATEGORIES = [
   { label: "All Types", icon: ChefHat, active: true },
@@ -31,106 +32,55 @@ const CATEGORIES = [
   { label: "Quick & Easy Supper", icon: Zap },
 ];
 
-const RECIPES = [
-  {
-    title: "Fresh Salad with Tahini Sauce",
-    views: "250+",
-    img: "https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=600&auto=format&fit=crop",
-  },
-  {
-    title: "Chili con Carne with Nachos Chips",
-    views: "150+",
-    img: "https://images.unsplash.com/photo-1606491956689-2ea866880c84?q=80&w=600&auto=format&fit=crop",
-  },
-  {
-    title: "Sour & Spicy Korean Kimchi",
-    views: "200+",
-    img: "https://images.unsplash.com/photo-1583224964978-2257b960c3d6?q=80&w=600&auto=format&fit=crop",
-  },
-  {
-    title: "Flat Noodles with Shrimp Veggie",
-    views: "200+",
-    img: "https://images.unsplash.com/photo-1585032226651-759b368d7246?q=80&w=600&auto=format&fit=crop",
-  },
-  {
-    title: "Cauliflower Steak Chimichurri Spices",
-    views: "150+",
-    img: "https://images.unsplash.com/photo-1540420773420-4d0c2a6e6dc8?q=80&w=600&auto=format&fit=crop",
-  },
-];
-
-function RecipeCard({ title, views, img, highlight, description }) {
-  if (highlight) {
-    return (
-      <div className="group relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#ffb646] to-[#ff9c1f] p-6 flex flex-col justify-between min-h-[300px]">
-        <div>
-          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-white/90 bg-black/15 px-2.5 py-1 rounded-full mb-4">
-            <Eye size={12} /> {views}
-          </span>
-          <h3
-            className="text-[21px] leading-snug text-white mb-2"
-            style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 700 }}
-          >
-            {title}
-          </h3>
-          <p className="text-[13px] text-white/85 leading-relaxed max-w-[85%]">
-            {description}
-          </p>
-        </div>
-        <button className="self-start inline-flex items-center gap-2 bg-stone-900 text-white text-[12.5px] font-semibold px-4 py-2.5 rounded-full hover:bg-black transition-colors">
-          See Complete Recipe
-          <ArrowUpRight size={14} />
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="group relative rounded-2xl overflow-hidden bg-stone-100 min-h-[300px]">
-      <img
-        src={img}
-        alt={title}
-        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/0 to-black/0" />
-
-      <span className="absolute top-4 right-4 inline-flex items-center gap-1 text-[11px] font-semibold text-stone-800 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full">
-        <Eye size={12} /> {views}
-      </span>
-
-      <div className="absolute top-4 left-4 right-16">
-        <h3
-          className="text-[19px] leading-snug text-stone-900"
-          style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 700 }}
-        >
-          {title}
-        </h3>
-      </div>
-
-      <button className="absolute left-4 right-4 bottom-4 inline-flex items-center justify-center gap-2 bg-stone-900/90 backdrop-blur text-white text-[12.5px] font-semibold px-4 py-2.5 rounded-full hover:bg-black transition-colors">
-        See Complete Recipe
-        <ArrowUpRight size={14} />
-      </button>
-    </div>
-  );
-}
+// const RECIPES = [
+//   {
+//     title: "Fresh Salad with Tahini Sauce",
+//     views: "250+",
+//     img: "https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=600&auto=format&fit=crop",
+//   },
+//   {
+//     title: "Chili con Carne with Nachos Chips",
+//     views: "150+",
+//     img: "https://images.unsplash.com/photo-1606491956689-2ea866880c84?q=80&w=600&auto=format&fit=crop",
+//   },
+//   {
+//     title: "Sour & Spicy Korean Kimchi",
+//     views: "200+",
+//     img: "https://images.unsplash.com/photo-1583224964978-2257b960c3d6?q=80&w=600&auto=format&fit=crop",
+//   },
+//   {
+//     title: "Flat Noodles with Shrimp Veggie",
+//     views: "200+",
+//     img: "https://images.unsplash.com/photo-1585032226651-759b368d7246?q=80&w=600&auto=format&fit=crop",
+//   },
+//   {
+//     title: "Cauliflower Steak Chimichurri Spices",
+//     views: "150+",
+//     img: "https://images.unsplash.com/photo-1540420773420-4d0c2a6e6dc8?q=80&w=600&auto=format&fit=crop",
+//   },
+// ];
 
 export default function Hero() {
   const [active, setActive] = useState("All Types");
   const [categories, setCategories] = useState([]);
+  const [recipes, setRecipes] = useState([]);
 
   useEffect(() => {
+    async function fetchRecipes() {
+      await axios.get("http://localhost:5000/api/v1/recipe").then((res) => {
+        setRecipes(res.data);
+      });
+    }
     async function fetchCategories() {
       await axios.get("http://localhost:5000/api/v1/category").then((res) => {
         setCategories(res.data);
       });
     }
     fetchCategories();
+    fetchRecipes();
   }, []);
 
   const showCategories = categories?.map((categroy) => {
-    console.log(categroy);
-
     return (
       <button
         key={categroy._id}
@@ -143,6 +93,65 @@ export default function Hero() {
       >
         {categroy.name}
       </button>
+    );
+  });
+
+  const showRecipes = recipes?.map((recipe) => {
+    return (
+      <div
+        key={recipe._id}
+        className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-stone-200 bg-white shadow-[0_18px_45px_-24px_rgba(15,23,42,0.45)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_25px_60px_-22px_rgba(15,23,42,0.55)]"
+      >
+        <div className="relative overflow-hidden">
+          <div className="relative aspect-[4/3]">
+            <Image
+              src={`http://localhost:5000/images/${encodeURIComponent(recipe.coverImage)}`}
+              alt={recipe.title}
+              fill
+              unoptimized
+              className="object-cover transition duration-500 group-hover:scale-105"
+              loading="eager"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/5 to-transparent" />
+            <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-stone-700 backdrop-blur">
+              <ChefHat size={11} className="text-[#ffa71c]" />
+              {recipe.categroy}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex flex-1 flex-col p-5">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-[11px] font-semibold text-stone-500">
+              <Eye size={13} className="text-[#ffa71c]" />
+              {recipe.rating ? `${recipe.rating}` : "Fresh recipe"}
+            </div>
+            <span className="rounded-full bg-[#fff3df] px-2.5 py-1 text-[10px] font-semibold text-[#a95f00]">
+              {recipe.time || "Quick"}
+            </span>
+          </div>
+
+          <h3
+            className="text-[20px] leading-snug text-stone-900 mb-2"
+            style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 700 }}
+          >
+            {recipe.title}
+          </h3>
+          <p className="text-[13px] leading-relaxed text-stone-600">
+            {recipe.descirption}
+          </p>
+
+          <div className="mt-auto pt-4">
+            <Link
+              href={`/recipedetails/${recipe._id}`}
+              className="inline-flex items-center gap-2 rounded-full bg-stone-900 px-4 py-2.5 text-[12.5px] font-semibold text-white transition-colors hover:bg-black"
+            >
+              See Complete Recipe
+              <ArrowUpRight size={14} />
+            </Link>
+          </div>
+        </div>
+      </div>
     );
   });
 
@@ -179,11 +188,13 @@ export default function Hero() {
                 </button>
               </Link>
             </div>
-            <div className="hidden sm:block absolute right-0 top-0 bottom-0 w-[55%] lg:w-[48%]">
-              <img
-                src="https://images.unsplash.com/photo-1467003909585-2f8a72700288?q=80&w=1000&auto=format&fit=crop"
+            <div className="sm:block absolute right-0 top-0 bottom-0 w-[55%] lg:w-[48%]">
+              <Image
+                src={"/photo-1467003909585-2f8a72700288[1]jpg.jpg"}
                 alt="Seared tuna salad"
                 className="w-full h-full object-cover"
+                width={480}
+                height={0}
                 style={{
                   maskImage:
                     "linear-gradient(to right, transparent, black 15%)",
@@ -235,28 +246,16 @@ export default function Hero() {
 
           {/* Recipe grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {RECIPES.slice(0, 3).map((r) => (
-              <RecipeCard key={r.title} {...r} />
-            ))}
-            {RECIPES.slice(3, 4).map((r) => (
-              <RecipeCard key={r.title} {...r} />
-            ))}
-            <RecipeCard
-              highlight
-              title="Classic Italian Beef Maltagliati"
-              views="180+"
-              description="Layers of spicy goodness, hearty meat, and savory sauce. A timeless favorite with Maltagliati pasta."
-            />
-            {RECIPES.slice(4, 5).map((r) => (
-              <RecipeCard key={r.title} {...r} />
-            ))}
+            {showRecipes}
           </div>
 
           <div className="flex justify-center mt-10">
-            <button className="inline-flex items-center gap-2 border border-stone-300 text-stone-700 text-[13.5px] font-semibold px-6 py-3 rounded-full hover:border-[#ffa71c] hover:text-stone-900 transition-colors">
-              View All Recipes
-              <ArrowUpRight size={15} />
-            </button>
+            <Link href={"/recipes"}>
+              <button className="inline-flex items-center gap-2 border border-stone-300 text-stone-700 text-[13.5px] font-semibold px-6 py-3 rounded-full hover:border-[#ffa71c] hover:text-stone-900 transition-colors">
+                View All Recipes
+                <ArrowUpRight size={15} />
+              </button>
+            </Link>
           </div>
         </main>
       </div>

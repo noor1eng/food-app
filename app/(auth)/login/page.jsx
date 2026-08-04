@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { Mail } from "lucide-react";
+import { ArrowRight, Mail } from "lucide-react";
 import { LoginSchema } from "@/app/zod/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -10,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/token";
 
 const inputClass =
-  "w-full rounded-xl border border-stone-200 bg-stone-50/60 pl-11 pr-4 py-3 text-[14px] text-stone-800 placeholder:text-stone-400 outline-none transition-all focus:bg-white focus:border-[#ffa71c] focus:ring-4 focus:ring-[#ffa71c]/10";
+  "w-full rounded-2xl border border-stone-200 bg-stone-50/80 pl-11 pr-4 py-3.5 text-[14px] text-stone-800 placeholder:text-stone-400 outline-none transition-all focus:border-[#ffa71c] focus:bg-white focus:shadow-[0_0_0_4px_rgba(255,167,28,0.12)]";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -39,34 +38,33 @@ export default function LoginPage() {
       console.log(err);
     }
   };
+
   return (
     <div
-      className="min-h-screen w-full bg-[#f7f7f7] text-stone-900 flex"
+      className="min-h-screen bg-[linear-gradient(135deg,_#fffaf3_0%,_#f7f7f7_100%)] px-4 py-6 sm:px-6 lg:px-8"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
-      <div className="flex-1 flex items-center justify-center px-6 sm:px-10 py-12">
-        <div className="w-full max-w-[400px]">
-          {/* mobile logo */}
-          <div
-            className="lg:hidden text-2xl tracking-tight text-stone-900 mb-10 text-center"
-            style={{ fontFamily: "'Fraunces', serif" }}
-          >
-            Fla<span className="text-[#ffa71c]">voriz</span>
+      <div className="mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-[430px] items-center justify-center">
+        <div className="w-full rounded-[28px] border border-stone-200/80 bg-white p-6 shadow-[0_20px_60px_-24px_rgba(34,34,34,0.24)] sm:p-8">
+          <div className="text-center">
+            <p
+              className="text-[26px] font-semibold tracking-tight text-stone-900"
+              style={{ fontFamily: "'Fraunces', serif" }}
+            >
+              Flavoriz
+            </p>
+            <p className="mt-2 text-sm text-stone-500">
+              Welcome back. Sign in to continue.
+            </p>
           </div>
 
-          <h1
-            className="text-[28px] sm:text-[30px] leading-tight text-stone-900"
-            style={{ fontFamily: "'Fraunces', serif" }}
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
+            className="mt-6 space-y-4"
           >
-            Welcome back
-          </h1>
-          <p className="text-stone-500 text-[14px] mt-2 mb-8">
-            Log in to keep cooking up something great.
-          </p>
-
-          <form onSubmit={handleSubmit(onSubmit)} noValidate>
-            <div className="mb-4">
-              <label className="text-[13px] font-semibold text-stone-700 mb-1.5 block">
+            <div>
+              <label className="mb-1.5 block text-[13px] font-semibold text-stone-700">
                 Email
               </label>
               <div className="relative">
@@ -80,16 +78,16 @@ export default function LoginPage() {
                   placeholder="you@example.com"
                   className={inputClass}
                 />
-                <p className="text-red-500 text-sm">{errors.email?.message}</p>
               </div>
+              <p className="mt-1 text-sm text-red-500">
+                {errors.email?.message}
+              </p>
             </div>
 
-            <div className="mb-2">
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="text-[13px] font-semibold text-stone-700">
-                  Password
-                </label>
-              </div>
+            <div>
+              <label className="mb-1.5 block text-[13px] font-semibold text-stone-700">
+                Password
+              </label>
               <div className="relative">
                 <input
                   type="password"
@@ -97,26 +95,28 @@ export default function LoginPage() {
                   placeholder="••••••••"
                   className={inputClass}
                 />
-                <p className="text-red-500 text-sm">
-                  {errors.password?.message}
-                </p>
               </div>
+              <p className="mt-1 text-sm text-red-500">
+                {errors.password?.message}
+              </p>
             </div>
 
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#ffa71c] text-stone-900 font-semibold text-[14.5px] py-3 hover:bg-[#ff9c00] shadow-[0_10px_24px_-8px_rgba(255,167,28,0.6)] transition-colors disabled:opacity-70"
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#ffa71c] py-3.5 text-[14.5px] font-semibold text-stone-900 transition-all hover:bg-[#ff9c00]"
             >
-              logIn
+              Log in
+              <ArrowRight size={16} />
             </button>
           </form>
 
-          <p className="text-center text-[13.5px] text-stone-500 mt-8">
-            Don't have an account?{" "}
-            <Link href="register">
-              <button className="font-semibold text-[#a95f00] hover:text-stone-900 transition-colors">
-                Sign up for free
-              </button>
+          <p className="mt-6 text-center text-[13.5px] text-stone-500">
+            Don’t have an account?{" "}
+            <Link
+              href="/register"
+              className="font-semibold text-[#a95f00] transition-colors hover:text-stone-900"
+            >
+              Create one
             </Link>
           </p>
         </div>

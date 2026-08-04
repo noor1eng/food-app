@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/context/token";
 
 function FieldLabel({ children, hint }) {
   return (
@@ -123,7 +124,7 @@ export default function AddRecipePage() {
   const [preview, setPreview] = useState(null);
   const [fileName, setFileName] = useState("");
   const [categories, setCategories] = useState([]);
-  const token = localStorage.getItem("token");
+  const { token } = useAuth();
   const router = useRouter();
 
   useEffect(() => {

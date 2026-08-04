@@ -10,13 +10,7 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import Image from "next/image";
-import { set } from "zod";
-
-/* ---------------------------------------------------------
-   FLAVORIZ — Edit Recipe
-   Fetches the recipe by ID, preserves the existing cover image
-   when unchanged, and updates it through FormData.
---------------------------------------------------------- */
+import { useAuth } from "@/app/context/token";
 
 function FieldLabel({ children, hint }) {
   return (
@@ -52,8 +46,7 @@ export default function EditRecipePage() {
   const [categories, setCategories] = useState([]);
   const [status, setStatus] = useState("idle");
   const [category, setCategory] = useState([]);
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : "";
+  const { token } = useAuth();
 
   useEffect(() => {
     if (!recipeId) return;
