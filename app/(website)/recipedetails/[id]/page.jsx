@@ -150,6 +150,27 @@ export default function RecipeDetailsPage() {
     setUserRating(0);
   };
 
+  async function handleEditFavorate(id) {
+    const formData = new FormData();
+    formData.append("title", recipe.title);
+    formData.append("description", recipe.description);
+    formData.append("category", recipe.category);
+    formData.append("time", recipe.time);
+    formData.append("difficulty", recipe.difficulty);
+    formData.append("ingrediaint", recipe.ingrediaint);
+    formData.append("instructions", recipe.instructions);
+    formData.append("favorate", true);
+    try {
+      await axios
+        .put(`http://localhost:5000/api/v1/recipe/${id}`, formData)
+        .then((res) => {
+          console.log(res.data);
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   return (
     <div
       className="w-full bg-[#f7f7f7] text-stone-900"
@@ -176,7 +197,7 @@ export default function RecipeDetailsPage() {
             </span>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setSaved((s) => !s)}
+                onClick={() => handleEditFavorate(recipe._id)}
                 className={`w-9 h-9 rounded-full flex items-center justify-center backdrop-blur transition-colors ${
                   saved
                     ? "bg-[#ffa71c] text-stone-900"

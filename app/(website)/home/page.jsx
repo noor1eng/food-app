@@ -13,7 +13,6 @@ import {
   Zap,
   ArrowUpRight,
   Plus,
-  Icon,
 } from "lucide-react";
 import Navbar from "../../Navbar";
 import Link from "next/link";
@@ -164,7 +163,7 @@ export default function Hero() {
       >
         <main className="max-w-7xl mx-auto px-5 sm:px-8 py-8">
           {/* Hero banner */}
-          <section className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#eef1ea] to-[#e4e8dd] min-h-[220px] sm:min-h-[260px] flex items-center">
+          <section className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#eef1ea] to-[#e4e8de] min-h-[220px] sm:min-h-[260px] flex items-center">
             <div
               className="pointer-events-none absolute inset-0 opacity-[0.35]"
               style={{
@@ -182,7 +181,7 @@ export default function Hero() {
                 Insights
               </h1>
               <Link href="/dashboard/addrecipe">
-                <button className="hidden sm:inline-flex items-center mt-5 gap-1.5 bg-stone-800 text-white text-[12.5px] font-semibold pl-3.5 pr-4 py-2.5 rounded-full hover:bg-black transition-colors">
+                <button className="flex justify-center items-center mt-5 gap-1.5 bg-stone-800 text-white text-[10.5px] lg:text-[12.5px] font-semibold pl-3.5 pr-4 py-2.5 rounded-full hover:bg-black transition-colors">
                   <Plus size={15} className="text-[#ffa71c]" />
                   Add Recipe
                 </button>
@@ -246,7 +245,16 @@ export default function Hero() {
 
           {/* Recipe grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {showRecipes}
+            {showRecipes ? (
+              showRecipes
+            ) : (
+              <div className="text-center py-24">
+                <span className="inline-flex w-14 h-14 rounded-full bg-[#ffa71c]/12 items-center justify-center mb-4">
+                  <ChefHat size={22} className="text-[#a95f00]" />
+                </span>
+                <p className="text-stone-500 text-[14px]">No recipes to show</p>
+              </div>
+            )}
           </div>
 
           <div className="flex justify-center mt-10">

@@ -19,6 +19,10 @@ import {
   ChevronRight,
   Menu,
   X,
+  Heart,
+  Clock,
+  Gauge,
+  Star,
 } from "lucide-react";
 import axios from "axios";
 import Image from "next/image";
@@ -122,65 +126,50 @@ export default function RecipesPage() {
   }, [active, query]);
 
   const showRecipes = recipes.map((recipe) => {
-    const imageSrc = recipe.coverImage?.startsWith("http")
-      ? recipe.coverImage
-      : `http://localhost:5000/images/${encodeURIComponent(recipe.coverImage || "default.jpg")}`;
-
     const categoryLabel = recipe.category || "Uncategorized";
-    const shortDescription =
-      recipe.description?.length > 95
-        ? `${recipe.description.slice(0, 95)}...`
-        : recipe.description ||
-          "A flavorful recipe with simple ingredients and a comforting finish.";
-
     return (
       <div
         key={recipe._id}
-        className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-stone-200 bg-white shadow-[0_18px_45px_-24px_rgba(15,23,42,0.45)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_25px_60px_-22px_rgba(15,23,42,0.55)]"
+        className="group rounded-2xl border border-stone-200 bg-white overflow-hidden hover:shadow-[0_16px_32px_-16px_rgba(0,0,0,0.15)] transition-shadow"
       >
-        <div className="relative overflow-hidden">
-          <div className="relative aspect-[4/3]">
-            <Image
-              src={imageSrc}
-              alt={recipe.title}
-              fill
-              unoptimized
-              className="object-cover transition duration-500 group-hover:scale-105"
-              loading="eager"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/5 to-transparent" />
-            <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-stone-700 backdrop-blur">
-              <ChefHat size={11} className="text-[#ffa71c]" />
-              {/* {categoryLabel} */}
-            </span>
-          </div>
+        <div className="relative aspect-[4/3] overflow-hidden">
+          <Image
+            src={`http://localhost:5000/images/${encodeURIComponent(recipe.coverImage)}`}
+            alt={recipe.title}
+            fill
+            unoptimized
+            className="h-full w-full object-cover"
+            loading="eager"
+          />
+          {/* <span className="absolute top-3 left-3 text-[11px] font-semibold text-stone-800 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full">
+            {categoryLabel}
+          </span> */}
         </div>
 
-        <div className="flex flex-1 flex-col p-5">
-          <div className="mb-3 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[11px] font-semibold text-stone-500">
-              <Eye size={13} className="text-[#ffa71c]" />
-              {recipe.rating ? `${recipe.rating}` : "Fresh recipe"}
-            </div>
-            <span className="rounded-full bg-[#fff3df] px-2.5 py-1 text-[10px] font-semibold text-[#a95f00]">
-              {recipe.time || "Quick"}
-            </span>
-          </div>
-
+        <div className="p-4">
           <h3
-            className="text-[20px] leading-snug text-stone-900 mb-2"
-            style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 700 }}
+            className="text-[16px] text-stone-900 mb-2 truncate"
+            style={{ fontFamily: "'Fraunces', serif" }}
           >
             {recipe.title}
           </h3>
-          <p className="text-[13px] leading-relaxed text-stone-600">
-            {shortDescription}
-          </p>
 
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-stone-500">
+            <span className="inline-flex items-center gap-1">
+              <Clock size={12} /> {recipe.time}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Gauge size={12} /> {recipe.difficulty}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Star size={12} className="text-[#ffa71c] fill-[#ffa71c]" />
+              {recipe.rating}
+            </span>
+          </div>
           <div className="mt-auto pt-4">
             <Link
               href={`/recipedetails/${recipe._id}`}
-              className="inline-flex items-center gap-2 rounded-full bg-stone-900 px-4 py-2.5 text-[12.5px] font-semibold text-white transition-colors hover:bg-black"
+              className="inline-flex items-center gap-2 rounded-full bg-stone-900 px-4 py-1.5 text-[12.5px] font-semibold text-white transition-colors hover:bg-black"
             >
               See Complete Recipe
               <ArrowUpRight size={14} />

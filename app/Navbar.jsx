@@ -4,6 +4,7 @@ import { Menu, X, LayoutDashboard, LogOut, Languages } from "lucide-react";
 import Link from "next/link";
 import Logout from "./(auth)/Logout";
 import { useAuth } from "./context/token";
+import { set } from "zod";
 
 /* ---------------------------------------------------------
    FLAVORIZ — Navbar
@@ -22,9 +23,8 @@ export default function Navbar() {
   const { token } = useAuth();
   console.log(token);
   const [lang, setLang] = useState("en");
-
   const [open, setOpen] = useState(false);
-  const [active, setActive] = useState("Home");
+  const [active, setActive] = useState("");
   return (
     <div
       className="w-full bg-[#f7f7f7]"
@@ -43,12 +43,12 @@ export default function Navbar() {
 
           {/* Desktop nav */}
           <nav className="hidden lg:flex items-center gap-1">
-            {LINKS.map(({ label, active, href }) => (
+            {LINKS.map(({ label, href }) => (
               <Link
                 key={label}
                 href={href}
                 className={`relative px-4 py-2 text-[13px] font-semibold uppercase tracking-wide transition-colors rounded-full ${
-                  active
+                  active == label
                     ? "text-stone-900"
                     : "text-stone-400 hover:text-stone-700"
                 }`}
@@ -65,25 +65,13 @@ export default function Navbar() {
                 {/* Authenticated state */}
                 <Link
                   href="/dashboard"
-                  className="hidden sm:inline-flex items-center gap-1.5 text-[13px] font-semibold text-stone-600 hover:text-stone-900 px-3.5 py-2 rounded-full hover:bg-stone-100 transition-colors"
+                  className="flex sm:inline-flex items-center gap-1.5 text-[13px] font-semibold text-stone-600 hover:text-stone-900 px-3.5 py-2 rounded-full hover:bg-stone-100 transition-colors"
                 >
                   <LayoutDashboard size={15} />
                   Dashboard
                 </Link>
 
                 <Logout />
-
-                {/* Compact profile trigger for small screens */}
-                <button
-                  className="sm:hidden w-9 h-9 rounded-full overflow-hidden ring-2 ring-[#ffa71c]/40 shrink-0"
-                  aria-label="Account menu"
-                >
-                  <img
-                    src="https://i.pravatar.cc/64?img=13"
-                    className="w-full h-full object-cover"
-                    alt="Account"
-                  />
-                </button>
               </>
             ) : (
               <>
@@ -119,10 +107,10 @@ export default function Navbar() {
           }`}
         >
           <nav className="flex flex-col px-5 py-3">
-            {LINKS.map(({ label, active }) => (
+            {LINKS.map(({ label, active, href }) => (
               <Link
                 key={label}
-                href="#"
+                href={href}
                 className={`py-3 text-[14px] font-semibold uppercase tracking-wide border-b border-stone-100 flex items-center justify-between ${
                   active ? "text-stone-900" : "text-stone-400"
                 }`}
@@ -138,19 +126,11 @@ export default function Navbar() {
             <div className="pb-2">
               {token ? (
                 // ── Logged in ──────────────────────────────────
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2.5 mt-3">
                   <div className="flex items-center gap-2 flex-1 min-w-0 px-1">
-                    <img
-                      src="https://i.pravatar.cc/64?img=13"
-                      className="w-9 h-9 rounded-full object-cover ring-2 ring-[#ffa71c]/40 shrink-0"
-                      alt="Account"
-                    />
                     <div className="min-w-0">
-                      <p className="text-[13px] font-semibold text-stone-800 truncate leading-tight">
-                        Noor Al-Amin
-                      </p>
                       <Link
-                        href="#"
+                        href="/dashboard"
                         className="text-[11.5px] text-stone-400 inline-flex items-center gap-1 hover:text-stone-600 transition-colors"
                       >
                         <LayoutDashboard size={11} />
@@ -159,14 +139,11 @@ export default function Navbar() {
                     </div>
                   </div>
 
-                  <button className="inline-flex items-center gap-1.5 bg-stone-900 text-white text-[12.5px] font-semibold px-3.5 py-2 rounded-full hover:bg-black transition-colors shrink-0">
-                    <LogOut size={13} />
-                    Logout
-                  </button>
+                  <LogOut size={13} />
                 </div>
               ) : (
                 // ── Guest ──────────────────────────────────────
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 mt-4">
                   {/* زر الترجمة */}
                   <button
                     onClick={() => setLang(lang === "en" ? "ar" : "en")}

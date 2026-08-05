@@ -8,15 +8,16 @@ import {
   FolderHeart,
   UserCircle2,
   Settings,
-  LogOut,
-  Bell,
-  Search,
   Star,
   Clock,
   Gauge,
   HeartOff,
   ChefHat,
 } from "lucide-react";
+import axios from "axios";
+import Image from "next/image";
+import Link from "next/link";
+import { de, id } from "zod/locales";
 
 const NAV_ITEMS = [
   { label: "Dashboard", icon: LayoutGrid },
@@ -67,52 +68,6 @@ const INITIAL_FAVORITES = [
   },
 ];
 
-function FavoriteCard({ recipe, onRemove }) {
-  return (
-    <div className="group rounded-2xl border border-stone-200 bg-white overflow-hidden hover:shadow-[0_16px_32px_-16px_rgba(0,0,0,0.15)] transition-shadow">
-      <div className="relative aspect-[4/3] overflow-hidden">
-        <img
-          src={recipe.img}
-          alt={recipe.title}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-        <span className="absolute top-3 left-3 text-[11px] font-semibold text-stone-800 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full">
-          {recipe.category}
-        </span>
-        <button
-          onClick={() => onRemove(recipe.id)}
-          title="Remove from favorites"
-          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-[#ffa71c] hover:bg-red-500 hover:text-white transition-colors"
-        >
-          <Heart size={14} className="fill-current" />
-        </button>
-      </div>
-
-      <div className="p-4">
-        <h3
-          className="text-[16px] text-stone-900 mb-2 truncate"
-          style={{ fontFamily: "'Fraunces', serif" }}
-        >
-          {recipe.title}
-        </h3>
-
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-stone-500">
-          <span className="inline-flex items-center gap-1">
-            <Clock size={12} /> {recipe.time}
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <Gauge size={12} /> {recipe.difficulty}
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <Star size={12} className="text-[#ffa71c] fill-[#ffa71c]" />
-            {recipe.rating}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center text-center py-20 sm:py-28">
@@ -129,24 +84,106 @@ function EmptyState() {
         Recipes you save will show up here. Start exploring and tap the heart
         icon on any recipe you love.
       </p>
-      <button className="inline-flex items-center gap-1.5 bg-[#ffa71c] text-stone-900 text-[13.5px] font-semibold px-5 py-2.5 rounded-xl hover:bg-[#ff9c00] shadow-[0_8px_20px_-8px_rgba(255,167,28,0.6)] transition-colors">
-        <ChefHat size={15} /> Browse Recipes
-      </button>
+      <Link href={"/recipes"}>
+        <button className="inline-flex items-center gap-1.5 bg-[#ffa71c] text-stone-900 text-[13.5px] font-semibold px-5 py-2.5 rounded-xl hover:bg-[#ff9c00] shadow-[0_8px_20px_-8px_rgba(255,167,28,0.6)] transition-colors">
+          <ChefHat size={15} /> Browse Recipes
+        </button>
+      </Link>
     </div>
   );
 }
 
 export default function FavoritesPage() {
-  const [query, setQuery] = useState("");
   const [favorites, setFavorites] = useState(INITIAL_FAVORITES);
+  const [favorateRecipe, setFavorte] = useState([]);
+  const [del, setDelete] = useState(false);
 
-  const filtered = favorites.filter((r) =>
-    r.title.toLowerCase().includes(query.toLowerCase()),
-  );
+  useEffect(() => {
+    async function fetchRecipe() {
+      try {
+        await axios
+          .get(`http://localhost:5000/api/v1/recipe/favorate`)
+          .then((res) => {
+            console.log(res.data);
+            setFavorte(res.data);
+          });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    fetchRecipe();
+  }, []);
 
-  const handleRemove = (id) => {
-    setFavorites((prev) => prev.filter((r) => r.id !== id));
+  const handleRemove = async () => {
+    setDelete(true);
+    try {
+      if (del) {
+        // await axios
+        //   .put(
+        //     `http://localhost:5000/api/v1/recipe/${id}`,
+        //     (favorateRecipe.favorate = false),
+        //   )
+        //   .then((res) => {
+        //     console.log(res.data);
+        //   });
+        // console.log(favorateRecipe);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
+
+  const showFavorate = favorateRecipe.map((favrecipe) => {
+    return (
+      <div
+        key={favrecipe._id}
+        className="group rounded-2xl border border-stone-200 bg-white overflow-hidden hover:shadow-[0_16px_32px_-16px_rgba(0,0,0,0.15)] transition-shadow"
+      >
+        <div className="relative aspect-[4/3] overflow-hidden">
+          <Image
+            src={`http://localhost:5000/images/${encodeURIComponent(favrecipe.coverImage)}`}
+            alt={favrecipe.title}
+            fill
+            unoptimized
+            className="h-full w-full object-cover"
+            loading="eager"
+          />
+          <span className="absolute top-3 left-3 text-[11px] font-semibold text-stone-800 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full">
+            {favrecipe.category}
+          </span>
+          <button
+            onClick={() => handleRemove(favrecipe._id)}
+            title="Remove from favorites"
+            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-[#ffa71c] hover:bg-red-500 hover:text-white transition-colors"
+          >
+            <Heart size={14} className="fill-current" />
+          </button>
+        </div>
+
+        <div className="p-4">
+          <h3
+            className="text-[16px] text-stone-900 mb-2 truncate"
+            style={{ fontFamily: "'Fraunces', serif" }}
+          >
+            {favrecipe.title}
+          </h3>
+
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-stone-500">
+            <span className="inline-flex items-center gap-1">
+              <Clock size={12} /> {favrecipe.time}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Gauge size={12} /> {favrecipe.difficulty}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Star size={12} className="text-[#ffa71c] fill-[#ffa71c]" />
+              {favrecipe.rating}
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  });
 
   return (
     <div
@@ -174,19 +211,11 @@ export default function FavoritesPage() {
               </div>
             </div>
 
-            {favorites.length === 0 ? (
+            {favorateRecipe.length === 0 ? (
               <EmptyState />
-            ) : filtered.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {filtered.map((r) => (
-                  <FavoriteCard key={r.id} recipe={r} onRemove={handleRemove} />
-                ))}
-              </div>
             ) : (
-              <div className="text-center py-20">
-                <p className="text-stone-500 text-[14px]">
-                  No favorites match your search.
-                </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {showFavorate}
               </div>
             )}
           </main>
