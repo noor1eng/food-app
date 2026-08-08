@@ -18,6 +18,8 @@ import Navbar from "../../Navbar";
 import Link from "next/link";
 import axios from "axios";
 import Image from "next/image";
+import { useAuth } from "@/app/context/token";
+import { SkeletonCard } from "@/app/skeleton/SkeletonCard";
 
 const CATEGORIES = [
   { label: "All Types", icon: ChefHat, active: true },
@@ -63,11 +65,15 @@ export default function Hero() {
   const [active, setActive] = useState("All Types");
   const [categories, setCategories] = useState([]);
   const [recipes, setRecipes] = useState([]);
+  const [load, setLoad] = useState(false);
+  const { token } = useAuth();
 
   useEffect(() => {
+    setLoad(true);
     async function fetchRecipes() {
       await axios.get("http://localhost:5000/api/v1/recipe").then((res) => {
         setRecipes(res.data);
+        setLoad(false);
       });
     }
     async function fetchCategories() {
@@ -180,14 +186,14 @@ export default function Hero() {
                 Explore <span className="text-[#ffa71c]">Culinary</span>{" "}
                 Insights
               </h1>
-              <Link href="/dashboard/addrecipe">
+              <Link href={token ? "/dashboard/addrecipe" : "/register"}>
                 <button className="flex justify-center items-center mt-5 gap-1.5 bg-stone-800 text-white text-[10.5px] lg:text-[12.5px] font-semibold pl-3.5 pr-4 py-2.5 rounded-full hover:bg-black transition-colors">
                   <Plus size={15} className="text-[#ffa71c]" />
                   Add Recipe
                 </button>
               </Link>
             </div>
-            <div className="sm:block absolute right-0 top-0 bottom-0 w-[55%] lg:w-[48%]">
+            <div className="sm:block absolute right-0 top-0 bottom-0 w-[55%]">
               <Image
                 src={"/photo-1467003909585-2f8a72700288[1]jpg.jpg"}
                 alt="Seared tuna salad"
@@ -244,19 +250,33 @@ export default function Hero() {
           </div>
 
           {/* Recipe grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {showRecipes ? (
-              showRecipes
-            ) : (
-              <div className="text-center py-24">
-                <span className="inline-flex w-14 h-14 rounded-full bg-[#ffa71c]/12 items-center justify-center mb-4">
-                  <ChefHat size={22} className="text-[#a95f00]" />
-                </span>
-                <p className="text-stone-500 text-[14px]">No recipes to show</p>
-              </div>
-            )}
-          </div>
-
+          {showRecipes.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {showRecipes}
+            </div>
+          ) : load === true ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <SkeletonCard key={i} />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center text-center py-8 min-h-[200px]">
+              <span className="inline-flex w-16 h-16 rounded-full bg-[#ffa71c]/12 items-center justify-center mb-5">
+                <ChefHat size={26} className="text-[#a95f00]" />
+              </span>
+              <h3
+                className="text-[17px] text-stone-900 mb-1.5"
+                style={{ fontFamily: "'Fraunces', serif" }}
+              >
+                No recipes to show
+              </h3>
+              <p className="text-stone-500 text-[13.5px] max-w-xs">
+                There's nothing here yet. Recipes you add will show up in this
+                list.
+              </p>
+            </div>
+          )}
           <div className="flex justify-center mt-10">
             <Link href={"/recipes"}>
               <button className="inline-flex items-center gap-2 border border-stone-300 text-stone-700 text-[13.5px] font-semibold px-6 py-3 rounded-full hover:border-[#ffa71c] hover:text-stone-900 transition-colors">

@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/token";
+import { toast } from "@/components/ui/toast";
 
 const inputClass =
   "w-full rounded-2xl border border-stone-200 bg-stone-50/80 pl-11 pr-4 py-3.5 text-[14px] text-stone-800 placeholder:text-stone-400 outline-none transition-all focus:border-[#ffa71c] focus:bg-white focus:shadow-[0_0_0_4px_rgba(255,167,28,0.12)]";
@@ -26,16 +27,29 @@ export default function LoginPage() {
 
   const onSubmit = async (data) => {
     try {
-      await axios
-        .post("http://localhost:5000/api/v1/user/login", data)
-        .then((res) => {
-          setToken(res.data.token);
-          console.log(res);
-          localStorage.setItem("token", res.data.token);
-          router.push("/");
-        });
+      const res = await axios.post(
+        "http://localhost:5000/api/v1/user/login",
+        data,
+      );
+      setToken(res.data.token);
+      localStorage.setItem("token", res.data.token);
+      toast.add({
+        title: "Welcome back",
+        description: "You have successfully signed in.",
+        type: "success",
+        timeout: 2000,
+      });
+      router.push("/");
     } catch (err) {
-      console.log(err);
+      console.error(err);
+      toast.add({
+        title: "Login failed",
+        description:
+          err?.response?.data?.message ||
+          "Unable to sign in. Check your credentials.",
+        type: "error",
+        timeout: 2000,
+      });
     }
   };
 

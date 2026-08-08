@@ -12,6 +12,7 @@ import {
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/token";
+import { toast } from "@/components/ui/toast";
 
 function FieldLabel({ children, hint }) {
   return (
@@ -178,10 +179,22 @@ export default function AddRecipePage() {
           "Content-Type": "multipart/form-data",
         },
       });
+      toast.add({
+        title: "Recipe added",
+        description: "Your recipe has been saved successfully.",
+        type: "success",
+        timeout: 2000,
+      });
       handleImageRemove();
       router.push("/dashboard/myrecipe");
     } catch (err) {
       console.error(err);
+      toast.add({
+        title: "Unable to add recipe",
+        description: err?.response?.data?.message || "Please try again later.",
+        type: "error",
+        timeout: 2000,
+      });
     }
   };
 

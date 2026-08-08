@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@/app/context/token";
+import { toast } from "@/components/ui/toast";
 
 /* ---------------------------------------------------------
    FLAVORIZ — My Recipes
@@ -154,19 +155,29 @@ export default function MyRecipesPage() {
   }, [render]);
 
   async function deleterecipe(id) {
-    console.log(token);
-
-    await axios
-      .delete(`http://localhost:5000/api/v1/recipe/${id}`, {
+    try {
+      await axios.delete(`http://localhost:5000/api/v1/recipe/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      })
-      .then((res) => {
-        console.log(res);
-
-        setRender((prev) => !prev);
       });
+      toast.add({
+        title: "Recipe deleted",
+        description: "The recipe has been removed from your collection.",
+        type: "success",
+        timeout: 2000,
+      });
+      setRender((prev) => !prev);
+    } catch (err) {
+      console.error(err);
+      toast.add({
+        title: "Delete failed",
+        description:
+          err?.response?.data?.message || "Could not remove the recipe.",
+        type: "error",
+        timeout: 2000,
+      });
+    }
   }
 
   const showRecipes = recipes?.map((recipe, index) => {
@@ -300,7 +311,13 @@ export default function MyRecipesPage() {
 
             {/* Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {showRecipes ? showRecipes : <div>no recipes found</div>}
+              {showRecipes.length > 0 ? (
+                showRecipes
+              ) : (
+                <div className="col-span-full rounded-[24px] border border-dashed border-stone-300 bg-white/70 p-10 text-center text-stone-500">
+                  No recipes yet. Create the first one to get started.
+                </div>
+              )}
             </div>
 
             {/* <Pagination page={page} setPage={setPage} totalPages={totalPages} /> */}

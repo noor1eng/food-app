@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import Image from "next/image";
+import { SkeletonCard } from "@/app/skeleton/SkeletonCard";
 
 const LINKS = [
   { label: "Home", active: false },
@@ -111,13 +112,16 @@ export default function RecipesPage() {
   const [active, setActive] = useState("All Types");
   const [query, setQuery] = useState("");
   const [recipes, setRecipes] = useState([]);
+  const [load, setLoad] = useState(false);
 
   useEffect(() => {
+    setLoad(true);
     try {
       async function fetchRecipes() {
         const response = await axios.get("http://localhost:5000/api/v1/recipe");
         console.log(response.data);
         setRecipes(response.data);
+        setLoad(false);
       }
       fetchRecipes();
     } catch (error) {
@@ -141,9 +145,6 @@ export default function RecipesPage() {
             className="h-full w-full object-cover"
             loading="eager"
           />
-          {/* <span className="absolute top-3 left-3 text-[11px] font-semibold text-stone-800 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full">
-            {categoryLabel}
-          </span> */}
         </div>
 
         <div className="p-4">
@@ -244,6 +245,12 @@ export default function RecipesPage() {
         {recipes.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {showRecipes}
+          </div>
+        ) : load == true ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
           </div>
         ) : (
           <div className="text-center py-24">

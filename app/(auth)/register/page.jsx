@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
 import { useAuth } from "@/app/context/token";
+import { toast } from "@/components/ui/toast";
 
 const inputClass =
   "w-full rounded-2xl border border-stone-200 bg-stone-50/80 pl-11 pr-4 py-3.5 text-[14px] text-stone-800 placeholder:text-stone-400 outline-none transition-all focus:border-[#ffa71c] focus:bg-white focus:shadow-[0_0_0_4px_rgba(255,167,28,0.12)]";
@@ -24,17 +25,29 @@ export default function RegisterPage() {
 
   const onSubmit = async (data) => {
     try {
-      await axios
-        .post(`http://localhost:5000/api/v1/user/register`, data)
-        .then((res) => {
-          console.log(res);
-          setToken(res.data.token);
-          localStorage.setItem("token", res.data.token);
-          console.log(token);
-          router.push("/");
-        });
+      const res = await axios.post(
+        `http://localhost:5000/api/v1/user/register`,
+        data,
+      );
+      setToken(res.data.token);
+      localStorage.setItem("token", res.data.token);
+      toast.add({
+        title: "Account created",
+        description: "Welcome! Your account is ready to use.",
+        type: "success",
+        timeout: 2000,
+      });
+      router.push("/");
     } catch (err) {
-      console.log(err);
+      console.error(err);
+      toast.add({
+        title: "Registration failed",
+        description:
+          err?.response?.data?.message ||
+          "Unable to create an account. Try again.",
+        type: "error",
+        timeout: 2000,
+      });
     }
   };
 

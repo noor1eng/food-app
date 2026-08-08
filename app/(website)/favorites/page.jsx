@@ -18,6 +18,7 @@ import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import { de, id } from "zod/locales";
+import { SkeletonCard } from "@/app/skeleton/SkeletonCard";
 
 const NAV_ITEMS = [
   { label: "Dashboard", icon: LayoutGrid },
@@ -97,8 +98,10 @@ export default function FavoritesPage() {
   const [favorites, setFavorites] = useState(INITIAL_FAVORITES);
   const [favorateRecipe, setFavorte] = useState([]);
   const [del, setDelete] = useState(false);
+  const [load, setLoad] = useState(false);
 
   useEffect(() => {
+    setLoad(true);
     async function fetchRecipe() {
       try {
         await axios
@@ -107,8 +110,11 @@ export default function FavoritesPage() {
             console.log(res.data);
             setFavorte(res.data);
           });
+        setLoad(false);
       } catch (err) {
         console.log(err);
+      } finally {
+        setLoad(false);
       }
     }
     fetchRecipe();
@@ -211,12 +217,18 @@ export default function FavoritesPage() {
               </div>
             </div>
 
-            {favorateRecipe.length === 0 ? (
-              <EmptyState />
-            ) : (
+            {favorateRecipe.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {showFavorate}
               </div>
+            ) : load == true ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <SkeletonCard key={i} />
+                ))}
+              </div>
+            ) : (
+              <EmptyState />
             )}
           </main>
         </div>

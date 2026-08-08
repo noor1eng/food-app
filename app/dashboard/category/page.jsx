@@ -4,10 +4,12 @@ import { PlusCircle, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import axios from "axios";
 import Image from "next/image";
+import { useAuth } from "@/app/context/token";
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState([]);
   const [rand, setRand] = useState(false);
+  const { token } = useAuth();
 
   useEffect(() => {
     async function fetchCategory() {
@@ -25,7 +27,6 @@ export default function CategoriesPage() {
   }, [rand]);
 
   const deleteCategory = async (id) => {
-    const token = localStorage.getItem("token");
     try {
       await axios.delete(`http://localhost:5000/api/v1/category/${id}`, {
         headers: {

@@ -1,17 +1,10 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Menu, X, LayoutDashboard, LogOut, Languages } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import Logout from "./(auth)/Logout";
 import { useAuth } from "./context/token";
-import { set } from "zod";
-
-/* ---------------------------------------------------------
-   FLAVORIZ — Navbar
-   Clean editorial nav: white canvas, bold geometric wordmark.
-   Right cluster swaps between Sign In / Sign Up (guest) and
-   Dashboard / Logout (authenticated). Fully responsive.
-   --------------------------------------------------------- */
 
 const LINKS = [
   { label: "Home", href: "/" },
@@ -21,10 +14,16 @@ const LINKS = [
 
 export default function Navbar() {
   const { token } = useAuth();
-  console.log(token);
+  const pathname = usePathname();
   const [lang, setLang] = useState("en");
   const [open, setOpen] = useState(false);
-  const [active, setActive] = useState("");
+
+  // "/" should only be active on an exact match, otherwise every route
+  // would match it as a prefix. Other links match by prefix so nested
+  // routes (e.g. /recipes/123) still highlight "Recipes".
+  const isActive = (href) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
+
   return (
     <div
       className="w-full bg-[#f7f7f7]"
@@ -43,19 +42,22 @@ export default function Navbar() {
 
           {/* Desktop nav */}
           <nav className="hidden lg:flex items-center gap-1">
-            {LINKS.map(({ label, href }) => (
-              <Link
-                key={label}
-                href={href}
-                className={`relative px-4 py-2 text-[13px] font-semibold uppercase tracking-wide transition-colors rounded-full ${
-                  active == label
-                    ? "text-stone-900"
-                    : "text-stone-400 hover:text-stone-700"
-                }`}
-              >
-                {label}
-              </Link>
-            ))}
+            {LINKS.map(({ label, href }) => {
+              const active = isActive(href);
+              return (
+                <Link
+                  key={label}
+                  href={href}
+                  className={`relative px-4 py-2 text-[13px] font-semibold uppercase tracking-wide transition-colors rounded-full ${
+                    active
+                      ? "text-stone-900"
+                      : "text-stone-400 hover:text-stone-700"
+                  }`}
+                >
+                  {label}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Right cluster */}
@@ -107,20 +109,24 @@ export default function Navbar() {
           }`}
         >
           <nav className="flex flex-col px-5 py-3">
-            {LINKS.map(({ label, active, href }) => (
-              <Link
-                key={label}
-                href={href}
-                className={`py-3 text-[14px] font-semibold uppercase tracking-wide border-b border-stone-100 flex items-center justify-between ${
-                  active ? "text-stone-900" : "text-stone-400"
-                }`}
-              >
-                {label}
-                {active && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#ffa71c]" />
-                )}
-              </Link>
-            ))}
+            {LINKS.map(({ label, href }) => {
+              const active = isActive(href);
+              return (
+                <Link
+                  key={label}
+                  href={href}
+                  onClick={() => setOpen(false)}
+                  className={`py-3 text-[14px] font-semibold uppercase tracking-wide border-b border-stone-100 flex items-center justify-between ${
+                    active ? "text-stone-900" : "text-stone-400"
+                  }`}
+                >
+                  {label}
+                  {active && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#ffa71c]" />
+                  )}
+                </Link>
+              );
+            })}
 
             {/* Auth actions — mobile */}
             <div className="pb-2">

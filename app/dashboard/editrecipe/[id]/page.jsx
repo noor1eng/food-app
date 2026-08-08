@@ -11,6 +11,7 @@ import {
 import axios from "axios";
 import Image from "next/image";
 import { useAuth } from "@/app/context/token";
+import { toast } from "@/components/ui/toast";
 
 function FieldLabel({ children, hint }) {
   return (
@@ -121,10 +122,23 @@ export default function EditRecipePage() {
         },
       );
       setStatus("saved");
+      toast.add({
+        title: "Recipe updated",
+        description: "Your changes have been saved successfully.",
+        type: "success",
+        timeout: 2000,
+      });
       router.push("/dashboard/myrecipe");
     } catch (err) {
       console.error("Error updating recipe:", err);
       setStatus("error");
+      toast.add({
+        title: "Update failed",
+        description:
+          err?.response?.data?.message || "Unable to save recipe changes.",
+        type: "error",
+        timeout: 2000,
+      });
     }
   };
 

@@ -1,17 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
 
 html {
   height: 100%;
@@ -27,9 +16,6 @@ body {
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -51,358 +37,85 @@ a {
   }
 }
 
-/* color of the website 
-
-main color : #f7f7f7
-secondry color : #ffa71c
-third color : #222222 || #202020
-*/
-
-/*
-You are a senior Frontend Engineer and UI/UX Designer.
-
-I want you to build a premium Recipe Website inspired by the attached design.
-
-Important:
-- Do NOT copy the design pixel by pixel.
-- Keep the same overall feeling, spacing, premium quality, and modern aesthetic.
-- Create your own implementation with clean architecture.
-
-Stack:
-- Next.js 15 (App Router)
-- React
-- Tailwind CSS
-- Framer Motion
-- Lucide React Icons
-- shadcn/ui components
-- Responsive Design
-
-Use reusable components.
-
-----------------------------------------
-GENERAL STYLE
-----------------------------------------
-
-Create a premium food website.
-
-Style:
-
-- Modern
-- Minimal
-- Luxury
-- White background
-- Warm orange accent (#F59E0B)
-- Light gray sections
-- Large rounded corners (20-28px)
-- Soft shadows
-- Plenty of whitespace
-- Premium typography
-- Beautiful hover animations
-- Smooth transitions
-- Glass effects only where appropriate
-
-Use cards similar to premium Dribbble and Behance designs.
-
-----------------------------------------
-NAVBAR
-----------------------------------------
-
-Sticky navbar.
-
-Include:
-
-Logo:
-Flavoriz
-
-Links:
-
-Home
-Recipes
-Categories
-About
-Contact
-
-Search Bar
-
-Notification Icon
-
-Profile Avatar
-
-Dark Mode Toggle
-
-On mobile:
-
-Beautiful animated hamburger menu.
-
-Navbar should slightly blur while scrolling.
-
-----------------------------------------
-HERO SECTION
-----------------------------------------
-
-Create a large hero inspired by the screenshot.
-
-Left side:
-
-Large heading:
-
-Explore Culinary Insights
-
-Highlight the word
-
-Culinary
-
-using the orange accent.
-
-Subtitle describing the platform.
-
-Two CTA buttons:
-
-Explore Recipes
-
-Share Recipe
-
-Right side:
-
-Large rounded hero food image.
-
-Floating cards around the image:
-
-⭐ Rating
-
-👨‍🍳 Chef
-
-⏱ Cooking Time
-
-🍽 Categories
-
-Animated food decorations.
-
-Hero must have:
-
-Gradient background
-
-Soft shadows
-
-Floating animation
-
-Fade animation
-
-Responsive layout.
-
-----------------------------------------
-CATEGORY SECTION
-----------------------------------------
-
-Heading:
-
-What to Cook?
-
-Display beautiful rounded category pills.
-
-Examples:
-
-Breakfast
-
-Desserts
-
-Pasta
-
-Seafood
-
-Salads
-
-Healthy
-
-Quick Meals
-
-Vegetarian
-
-International
-
-Active category should use orange.
-
-----------------------------------------
-FEATURED RECIPES
-----------------------------------------
-
-Responsive grid.
-
-Recipe card contains:
-
-Large image
-
-Recipe title
-
-Cooking time
-
-Difficulty
-
-Rating
-
-Category
-
-View Recipe button
-
-Hover:
-
-Lift animation
-
-Image zoom
-
-Button animation
-
-Shadow increase
-
-----------------------------------------
-FOOTER
-----------------------------------------
-
-Premium footer.
-
-Newsletter
-
-Social icons
-
-Useful Links
-
-Company
-
-Support
-
-Contact
-
-Copyright
-
-----------------------------------------
-AUTH PAGES
-----------------------------------------
-
-Create beautiful authentication pages.
-
-1)
-
-Sign In
-
-Split Layout
-
-Left:
-
-Large food illustration
-
-Right:
-
-Glass card
-
-Fields:
-
-Email
-
-Password
-
-Remember Me
-
-Forgot Password
-
-Sign In Button
-
-Continue with Google
-
-Link:
-
-Create Account
-
-2)
-
-Sign Up
-
-Same design language.
-
-Fields:
-
-Full Name
-
-Email
-
-Password
-
-Confirm Password
-
-Create Account
-
-Google Sign Up
-
-Already have an account?
-
-----------------------------------------
-ANIMATIONS
-----------------------------------------
-
-Use Framer Motion.
-
-Animate:
-
-Navbar
-
-Hero
-
-Cards
-
-Buttons
-
-Sections
-
-Images
-
-Fade
-
-Slide
-
-Scale
-
-Stagger
-
-Scroll reveal
-
-----------------------------------------
-RESPONSIVE
-----------------------------------------
-
-Perfect on:
-
-Mobile
-
-Tablet
-
-Desktop
-
-Large Screens
-
-----------------------------------------
-CODE QUALITY
-----------------------------------------
-
-Use:
-
-App Router
-
-Reusable Components
-
-
-Clean Folder Structure
-
-No inline styles.
-
-Separate components into:
-
-components/
-ui/
-sections/
-layout/
-
-Use semantic HTML.
-
-Follow best practices.
-
-Generate production-ready code with beautiful UI. 
- */
+@layer base {
+  .theme {
+    --font-heading: var(--font-sans);
+    --font-sans: var(--font-sans);
+  }
+  :root {
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+    --primary: oklch(0.205 0 0);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.205 0 0);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
+    --accent: oklch(0.97 0 0);
+    --accent-foreground: oklch(0.205 0 0);
+    --destructive: oklch(0.577 0.245 27.325);
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: oklch(0.708 0 0);
+    --chart-1: oklch(0.87 0 0);
+    --chart-2: oklch(0.556 0 0);
+    --chart-3: oklch(0.439 0 0);
+    --chart-4: oklch(0.371 0 0);
+    --chart-5: oklch(0.269 0 0);
+    --radius: 0.625rem;
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.205 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.708 0 0);
+  }
+  .dark {
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.922 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.556 0 0);
+    --chart-1: oklch(0.87 0 0);
+    --chart-2: oklch(0.556 0 0);
+    --chart-3: oklch(0.439 0 0);
+    --chart-4: oklch(0.371 0 0);
+    --chart-5: oklch(0.269 0 0);
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.556 0 0);
+  }
+  * {
+    /* @apply border-border outline-ring/50; */
+  }
+  body {
+    /* @apply bg-background text-foreground; */
+  }
+  html {
+    @apply font-sans;
+  }
+}
