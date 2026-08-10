@@ -1,0 +1,202 @@
+{
+  "nav": {
+    "home": "الرئيسية",
+    "recipes": "الوصفات",
+    "favorites": "المفضلة",
+    "blog": "المدونة",
+    "contact": "اتصل",
+    "signIn": "تسجيل الدخول",
+    "signUp": "إنشاء حساب",
+    "signOut": "تسجيل الخروج",
+    "menu": "القائمة",
+    "dashboard": "لوحة التحكم",
+    "myRecipes": "وصفاتي",
+    "addRecipe": "إضافة وصفة",
+    "category": "التصنيف"
+  },
+
+  "home": {
+    "title": "اكتشف عالم الطهي",
+    "addRecipe": "إضافة وصفة",
+    "whatToCook": "ماذا ستطبخ اليوم؟",
+    "viewAllRecipes": "عرض جميع الوصفات",
+    "recipesFound": "تم العثور على {{count}} وصفة",
+    "noRecipes": "لا توجد وصفات للعرض",
+    "noRecipesDescription": "لا يوجد شيء هنا بعد. ستظهر الوصفات التي تضيفها في هذه القائمة."
+  },
+
+  "recipes": {
+    "title": "جميع الوصفات",
+    "searchPlaceholder": "ابحث في الوصفات...",
+    "seeCompleteRecipe": "عرض الوصفة الكاملة",
+    "noResults": "لا توجد وصفات تطابق بحثك.",
+    "filters": {
+      "allTypes": "جميع الأنواع",
+      "appetizers": "المقبلات",
+      "mainCourses": "الأطباق الرئيسية",
+      "saladsSides": "السلطات والأطباق الجانبية",
+      "vegetarian": "نباتي",
+      "international": "عالمي",
+      "desserts": "الحلويات",
+      "healthyEats": "أطباق صحية",
+      "quickEasy": "سريع وسهل"
+    }
+  },
+
+  "favorites": {
+    "title": "المفضلة",
+    "savedRecipes": "لقد حفظت {{count}} وصفات",
+    "emptyTitle": "لا توجد وصفات مفضلة بعد",
+    "emptyDescription": "ستظهر هنا الوصفات التي تحفظها. ابدأ باستكشاف الوصفات واضغط على أيقونة القلب على أي وصفة تعجبك.",
+    "emptyMessage": "الوصفات التي تحبها، كلها في مكان واحد",
+    "browseRecipes": "تصفح الوصفات",
+    "removeFromFavorites": "إزالة من المفضلة"
+  },
+
+  "auth": {
+    "brand": "Flavoriz",
+    "loginTitle": "مرحبًا بعودتك. سجّل الدخول للمتابعة.",
+    "registerTitle": "أنشئ حسابك وابدأ الطبخ.",
+    "name": "الاسم",
+    "namePlaceholder": "نور",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "you@example.com",
+    "password": "كلمة المرور",
+    "passwordPlaceholder": "••••••••",
+    "createPassword": "أنشئ كلمة مرور",
+    "login": "تسجيل الدخول",
+    "createAccount": "إنشاء حساب",
+    "noAccount": "ليس لديك حساب؟",
+    "alreadyHaveAccount": "لديك حساب بالفعل؟",
+    "signUp": "إنشاء حساب",
+    "signIn": "تسجيل الدخول"
+  },
+
+  "toast": {
+    "loginSuccessTitle": "مرحبًا بعودتك",
+    "loginSuccessDescription": "تم تسجيل الدخول بنجاح.",
+    "loginFailureTitle": "فشل تسجيل الدخول",
+    "loginFailureDescription": "تعذر تسجيل الدخول. تحقق من بياناتك.",
+    "registerSuccessTitle": "تم إنشاء الحساب",
+    "registerSuccessDescription": "مرحبًا! حسابك جاهز للاستخدام.",
+    "registerFailureTitle": "فشل التسجيل",
+    "registerFailureDescription": "تعذر إنشاء الحساب. حاول مرة أخرى."
+  },
+
+  "footer": {
+    "company": "الشركة",
+    "aboutUs": "معلومات عنا",
+    "ourStory": "قصتنا",
+    "careers": "الوظائف",
+    "press": "الصحافة",
+    "support": "الدعم",
+    "helpCenter": "مركز المساعدة",
+    "contactUs": "اتصل بنا",
+    "privacyPolicy": "سياسة الخصوصية",
+    "termsOfService": "شروط الخدمة",
+    "explore": "استكشاف",
+    "allRecipes": "جميع الوصفات",
+    "categories": "التصنيفات",
+    "popularRecipes": "الوصفات الشائعة",
+    "recentlyAdded": "أضيفت حديثًا",
+    "description": "اكتشف عالمًا من الوصفات الشهية ونصائح المطبخ والإلهام لكل وجبة.",
+    "email": "hello@flavoriz.com",
+    "phone": "+1 (555) 123-4567",
+    "location": "123 شارع النكهة، مدينة الطهي",
+    "copyright": "© 2026 Flavoriz. جميع الحقوق محفوظة."
+  },
+
+  "dashboard": {
+    "greeting": "صباح الخير، {{name}} 👋",
+    "stats": {
+      "totalRecipes": "إجمالي الوصفات",
+      "thisMonth": "+{{count}} هذا الشهر",
+      "totalViews": "إجمالي المشاهدات",
+      "viewsChange": "+{{percent}}%",
+      "avgRating": "متوسط التقييم",
+      "ratingChange": "+{{value}}",
+      "followers": "المتابعون",
+      "followersChange": "{{percent}}%"
+    }
+  },
+
+  "myRecipes": {
+    "title": "وصفاتي",
+    "description": "إدارة وتنظيم وصفاتك",
+    "addRecipe": "إضافة وصفة",
+    "empty": "لا توجد وصفات بعد. أنشئ أول وصفة للبدء.",
+    "newRecipe": "وصفة جديدة"
+  },
+
+  "recipeForm": {
+    "title": "شارك شيئًا لذيذًا",
+    "description": "اصنع قصة مميزة لطبقك من خلال تفاصيل جميلة، وصورة رئيسية جذابة، وخطوات واضحة للطهي.",
+
+    "essentials": {
+      "title": "أساسيات الوصفة",
+      "recipeTitle": "عنوان الوصفة",
+      "shortDescription": "وصف قصير",
+      "category": "التصنيف",
+      "selectCategory": "اختر التصنيف",
+      "cookingTime": "وقت الطهي",
+      "difficulty": "مستوى الصعوبة",
+      "selectDifficulty": "اختر مستوى الصعوبة",
+      "easy": "سهل",
+      "medium": "متوسط",
+      "hard": "صعب"
+    },
+
+    "story": {
+      "title": "أنشئ قصة الوصفة",
+      "ingredients": "المكونات",
+      "instructions": "طريقة التحضير"
+    },
+
+    "coverImage": {
+      "title": "الصورة الرئيسية",
+      "description": "أضف لمسة جذابة من البداية",
+      "upload": "اضغط للرفع أو اسحب وأفلت الصورة",
+      "formats": "PNG أو JPG، بحد أقصى 5MB",
+      "photoTipTitle": "نصيحة للتصوير",
+      "photoTip": "الإضاءة الطبيعية وزاوية التصوير الدافئة تجعل الأطباق أكثر جاذبية. تساعد الخلفية النظيفة على إبراز الطعام."
+    },
+
+    "actions": {
+      "save": "حفظ الوصفة",
+      "cancel": "إلغاء"
+    }
+  },
+
+  "categories": {
+    "title": "التصنيفات",
+    "description": "نظّم وصفاتك في مجموعات مرتبة وجميلة",
+    "addCategory": "إضافة تصنيف",
+    "empty": "لا توجد تصنيفات بعد. أنشئ أول تصنيف للبدء.",
+    "newCategory": "تصنيف جديد",
+
+    "form": {
+      "title": "أضف مجموعة جديدة",
+      "categoryName": "اسم التصنيف",
+      "description": "الوصف",
+      "cancel": "إلغاء",
+      "save": "حفظ التصنيف",
+      "coverImage": "صورة التصنيف",
+      "upload": "اضغط للرفع أو اسحب الصورة وأفلتها",
+      "formats": "PNG أو JPG بحد أقصى 5MB",
+      "preview": "ستظهر صورة التصنيف هنا قبل حفظها."
+    }
+  },
+  "recipeDetails": {
+    "about": "حول هذه الوصفة",
+    "instructions": "طريقة التحضير",
+    "ingredients": "المكونات",
+    "rateRecipe": "قيّم هذه الوصفة",
+    "reviews": "التقييمات والتعليقات",
+    "reviewsCount": "{{count}} تعليق",
+    "yourRating": "تقييمك",
+    "shareThoughts": "شارك رأيك حول هذه الوصفة...",
+    "postComment": "نشر التعليق",
+    "views": "المشاهدات",
+    "helpful": "مفيد"
+  }
+}

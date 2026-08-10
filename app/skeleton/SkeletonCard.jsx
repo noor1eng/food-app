@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function SkeletonCard() {
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className="flex flex-col justify-center mx-auto gap-4">
       <div className="group flex h-[400px] w-[350px] flex-col overflow-hidden rounded-[28px] border border-stone-200 bg-white">
         <div className="relative overflow-hidden">
           <div className="relative aspect-[4/3] bg-stone-200">

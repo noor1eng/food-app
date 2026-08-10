@@ -2,6 +2,7 @@ import { LogOut } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "../context/token";
 import { useRouter } from "next/navigation";
+import { t } from "@/app/il8n";
 
 export default function Logout() {
   const router = useRouter();
@@ -16,7 +17,7 @@ export default function Logout() {
       }}
     >
       <LogOut size={14} />
-      Logout
+      {t("nav.signOut")}
     </button>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { t, useI18n } from "@/app/il8n";
 
 /* ---------------------------------------------------------
    FLAVORIZ — Footer
@@ -23,22 +24,38 @@ function useFlavorizFonts() {
 
 const COLUMNS = [
   {
-    title: "Company",
-    links: ["About Us", "Our Story", "Careers", "Press"],
+    titleKey: "footer.company",
+    links: [
+      "footer.aboutUs",
+      "footer.ourStory",
+      "footer.careers",
+      "footer.press",
+    ],
   },
   {
-    title: "Support",
-    links: ["Help Center", "Contact Us", "Privacy Policy", "Terms of Service"],
+    titleKey: "footer.support",
+    links: [
+      "footer.helpCenter",
+      "footer.contactUs",
+      "footer.privacyPolicy",
+      "footer.termsOfService",
+    ],
   },
   {
-    title: "Explore",
-    links: ["All Recipes", "Categories", "Popular Recipes", "Recently Added"],
+    titleKey: "footer.explore",
+    links: [
+      "footer.allRecipes",
+      "footer.categories",
+      "footer.popularRecipes",
+      "footer.recentlyAdded",
+    ],
   },
 ];
 
 const SOCIALS = [];
 
 export default function Footer() {
+  const { language } = useI18n();
   useFlavorizFonts();
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -75,34 +92,30 @@ export default function Footer() {
               </span>
             </a>
             <p className="text-[13px] leading-relaxed mb-5">
-              Discover, create, and share amazing recipes from home cooks around
-              the world.
+              {t("footer.description")}
             </p>
 
             <div className="space-y-2 text-[12.5px]">
               <div className="flex items-center gap-2.5">
-                {/* <Mail size={13} className="text-[#ffa71c] shrink-0" /> */}
-                <span>hello@flavoriz.com</span>
+                <span>{t("footer.email")}</span>
               </div>
               <div className="flex items-center gap-2.5">
-                {/* <Phone size={13} className="text-[#ffa71c] shrink-0" /> */}
-                <span>+1 (555) 234-7890</span>
+                <span>{t("footer.phone")}</span>
               </div>
               <div className="flex items-center gap-2.5">
-                {/* <MapPin size={13} className="text-[#ffa71c] shrink-0" /> */}
-                <span>Amsterdam, Netherlands</span>
+                <span>{t("footer.location")}</span>
               </div>
             </div>
           </div>
 
           {/* Link columns */}
           {COLUMNS.map((col) => (
-            <div key={col.title}>
+            <div key={col.titleKey}>
               <h4
                 className="text-[13px] text-white uppercase tracking-wide mb-4"
                 style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 600 }}
               >
-                {col.title}
+                {t(col.titleKey)}
               </h4>
               <ul className="space-y-2.5">
                 {col.links.map((link) => (
@@ -111,7 +124,7 @@ export default function Footer() {
                       href="#"
                       className="text-[13px] hover:text-[#ffa71c] transition-colors"
                     >
-                      {link}
+                      {t(link)}
                     </a>
                   </li>
                 ))}
@@ -125,7 +138,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-5 py-6">
           <p className="text-[12px] text-stone-500 text-center sm:text-left">
-            © 2026 Flavoriz. All rights reserved.
+            {t("footer.copyright")}
           </p>
 
           <div className="flex items-center gap-3">
@@ -143,10 +156,10 @@ export default function Footer() {
 
           <div className="hidden sm:flex items-center gap-5 text-[12px] text-stone-500">
             <a href="#" className="hover:text-[#ffa71c] transition-colors">
-              Privacy Policy
+              {t("footer.privacyPolicy")}
             </a>
             <a href="#" className="hover:text-[#ffa71c] transition-colors">
-              Terms of Service
+              {t("footer.termsOfService")}
             </a>
           </div>
         </div>

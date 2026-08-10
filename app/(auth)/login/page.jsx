@@ -8,6 +8,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/token";
 import { toast } from "@/components/ui/toast";
+import { t, useI18n } from "@/app/il8n";
 
 const inputClass =
   "w-full rounded-2xl border border-stone-200 bg-stone-50/80 pl-11 pr-4 py-3.5 text-[14px] text-stone-800 placeholder:text-stone-400 outline-none transition-all focus:border-[#ffa71c] focus:bg-white focus:shadow-[0_0_0_4px_rgba(255,167,28,0.12)]";
@@ -16,6 +17,8 @@ export default function LoginPage() {
   const router = useRouter();
   const { token, setToken } = useAuth();
   console.log(token);
+
+  const { language } = useI18n();
 
   const {
     register,
@@ -34,8 +37,8 @@ export default function LoginPage() {
       setToken(res.data.token);
       localStorage.setItem("token", res.data.token);
       toast.add({
-        title: "Welcome back",
-        description: "You have successfully signed in.",
+        title: t("toast.loginSuccessTitle"),
+        description: t("toast.loginSuccessDescription"),
         type: "success",
         timeout: 2000,
       });
@@ -43,10 +46,9 @@ export default function LoginPage() {
     } catch (err) {
       console.error(err);
       toast.add({
-        title: "Login failed",
+        title: t("toast.loginFailureTitle"),
         description:
-          err?.response?.data?.message ||
-          "Unable to sign in. Check your credentials.",
+          err?.response?.data?.message || t("toast.loginFailureDescription"),
         type: "error",
         timeout: 2000,
       });
@@ -68,7 +70,7 @@ export default function LoginPage() {
               Flavoriz
             </p>
             <p className="mt-2 text-sm text-stone-500">
-              Welcome back. Sign in to continue.
+              {t("auth.loginTitle")}
             </p>
           </div>
 
@@ -79,7 +81,7 @@ export default function LoginPage() {
           >
             <div>
               <label className="mb-1.5 block text-[13px] font-semibold text-stone-700">
-                Email
+                {t("auth.email")}
               </label>
               <div className="relative">
                 <Mail
@@ -89,7 +91,7 @@ export default function LoginPage() {
                 <input
                   type="email"
                   {...register("email")}
-                  placeholder="you@example.com"
+                  placeholder={t("auth.emailPlaceholder")}
                   className={inputClass}
                 />
               </div>
@@ -100,13 +102,13 @@ export default function LoginPage() {
 
             <div>
               <label className="mb-1.5 block text-[13px] font-semibold text-stone-700">
-                Password
+                {t("auth.password")}
               </label>
               <div className="relative">
                 <input
                   type="password"
                   {...register("password")}
-                  placeholder="••••••••"
+                  placeholder={t("auth.passwordPlaceholder")}
                   className={inputClass}
                 />
               </div>
@@ -119,18 +121,18 @@ export default function LoginPage() {
               type="submit"
               className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#ffa71c] py-3.5 text-[14.5px] font-semibold text-stone-900 transition-all hover:bg-[#ff9c00]"
             >
-              Log in
+              {t("auth.login")}
               <ArrowRight size={16} />
             </button>
           </form>
 
           <p className="mt-6 text-center text-[13.5px] text-stone-500">
-            Don’t have an account?{" "}
+            {t("auth.noAccount")} {""}
             <Link
               href="/register"
               className="font-semibold text-[#a95f00] transition-colors hover:text-stone-900"
             >
-              Create one
+              {t("auth.signUp")}
             </Link>
           </p>
         </div>

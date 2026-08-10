@@ -20,17 +20,43 @@ import axios from "axios";
 import Image from "next/image";
 import { useAuth } from "@/app/context/token";
 import { SkeletonCard } from "@/app/skeleton/SkeletonCard";
+import { t, useI18n } from "@/app/il8n";
 
 const CATEGORIES = [
-  { label: "All Types", icon: ChefHat, active: true },
-  { label: "Appetizers", icon: Sandwich },
-  { label: "Main Courses", icon: Soup },
-  { label: "Salads & Sides", icon: Salad },
-  { label: "Vegetarian Delights", icon: Leaf },
-  { label: "International Flavors", icon: Globe2 },
-  { label: "Desserts & Sweets", icon: IceCreamCone },
-  { label: "Healthy Eats", icon: HeartPulse },
-  { label: "Quick & Easy Supper", icon: Zap },
+  {
+    value: "all",
+    labelKey: "recipes.filters.allTypes",
+    icon: ChefHat,
+    active: true,
+  },
+  {
+    value: "appetizers",
+    labelKey: "recipes.filters.appetizers",
+    icon: Sandwich,
+  },
+  { value: "mainCourses", labelKey: "recipes.filters.mainCourses", icon: Soup },
+  {
+    value: "saladsSides",
+    labelKey: "recipes.filters.saladsSides",
+    icon: Salad,
+  },
+  { value: "vegetarian", labelKey: "recipes.filters.vegetarian", icon: Leaf },
+  {
+    value: "international",
+    labelKey: "recipes.filters.international",
+    icon: Globe2,
+  },
+  {
+    value: "desserts",
+    labelKey: "recipes.filters.desserts",
+    icon: IceCreamCone,
+  },
+  {
+    value: "healthyEats",
+    labelKey: "recipes.filters.healthyEats",
+    icon: HeartPulse,
+  },
+  { value: "quickEasy", labelKey: "recipes.filters.quickEasy", icon: Zap },
 ];
 
 // const RECIPES = [
@@ -62,11 +88,12 @@ const CATEGORIES = [
 // ];
 
 export default function Hero() {
-  const [active, setActive] = useState("All Types");
+  const [active, setActive] = useState("all");
   const [categories, setCategories] = useState([]);
   const [recipes, setRecipes] = useState([]);
   const [load, setLoad] = useState(false);
   const { token } = useAuth();
+  const { language } = useI18n();
 
   useEffect(() => {
     setLoad(true);
@@ -85,18 +112,18 @@ export default function Hero() {
     fetchRecipes();
   }, []);
 
-  const showCategories = categories?.map((categroy) => {
+  const showCategories = categories?.map((category) => {
     return (
       <button
-        key={categroy._id}
-        onClick={() => setActive(categroy.name)}
+        key={category._id}
+        onClick={() => setActive(category.name)}
         className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-[13px] font-medium whitespace-nowrap border transition-colors ${
-          active === categroy.name
+          active === category.name
             ? "bg-stone-900 text-white border-stone-900"
             : "bg-white text-stone-500 border-stone-200 hover:border-[#ffa71c]/50 hover:text-stone-800"
         }`}
       >
-        {categroy.name}
+        {category.name}
       </button>
     );
   });
@@ -151,7 +178,7 @@ export default function Hero() {
               href={`/recipedetails/${recipe._id}`}
               className="inline-flex items-center gap-2 rounded-full bg-stone-900 px-4 py-2.5 text-[12.5px] font-semibold text-white transition-colors hover:bg-black"
             >
-              See Complete Recipe
+              {t("recipes.seeCompleteRecipe")}
               <ArrowUpRight size={14} />
             </Link>
           </div>
@@ -183,13 +210,12 @@ export default function Hero() {
                 className="text-[26px] sm:text-[38px] leading-[1.1] text-stone-900"
                 style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 700 }}
               >
-                Explore <span className="text-[#ffa71c]">Culinary</span>{" "}
-                Insights
+                {t("home.title")}
               </h1>
               <Link href={token ? "/dashboard/addrecipe" : "/register"}>
                 <button className="flex justify-center items-center mt-5 gap-1.5 bg-stone-800 text-white text-[10.5px] lg:text-[12.5px] font-semibold pl-3.5 pr-4 py-2.5 rounded-full hover:bg-black transition-colors">
                   <Plus size={15} className="text-[#ffa71c]" />
-                  Add Recipe
+                  {t("home.addRecipe")}
                 </button>
               </Link>
             </div>
@@ -216,7 +242,7 @@ export default function Hero() {
               className="text-[24px] sm:text-[28px] text-stone-900"
               style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 700 }}
             >
-              What to <span className="text-[#ffa71c]">Cook</span>?
+              {t("home.whatToCook")}
             </h2>
           </div>
 
@@ -230,7 +256,7 @@ export default function Hero() {
                     <button
                       key={index}
                       className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-[13px] font-medium whitespace-nowrap border transition-colors ${
-                        active === c.name
+                        active === c.value
                           ? "bg-stone-900 text-white border-stone-900"
                           : "bg-white text-stone-500 border-stone-200 hover:border-[#ffa71c]/50 hover:text-stone-800"
                       }`}
@@ -238,12 +264,12 @@ export default function Hero() {
                       <Icon
                         size={14}
                         className={
-                          active === c.name
+                          active === c.value
                             ? "text-[#ffa71c]"
                             : "text-stone-400"
                         }
                       />
-                      {c.name}
+                      {t(c.labelKey)}
                     </button>
                   );
                 })}
@@ -269,18 +295,17 @@ export default function Hero() {
                 className="text-[17px] text-stone-900 mb-1.5"
                 style={{ fontFamily: "'Fraunces', serif" }}
               >
-                No recipes to show
+                {t("home.noRecipes")}
               </h3>
               <p className="text-stone-500 text-[13.5px] max-w-xs">
-                There's nothing here yet. Recipes you add will show up in this
-                list.
+                {t("home.noRecipesDescription")}
               </p>
             </div>
           )}
           <div className="flex justify-center mt-10">
             <Link href={"/recipes"}>
               <button className="inline-flex items-center gap-2 border border-stone-300 text-stone-700 text-[13.5px] font-semibold px-6 py-3 rounded-full hover:border-[#ffa71c] hover:text-stone-900 transition-colors">
-                View All Recipes
+                {t("home.viewAllRecipes")}
                 <ArrowUpRight size={15} />
               </button>
             </Link>

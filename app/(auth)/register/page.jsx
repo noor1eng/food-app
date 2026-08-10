@@ -8,11 +8,13 @@ import Link from "next/link";
 import axios from "axios";
 import { useAuth } from "@/app/context/token";
 import { toast } from "@/components/ui/toast";
+import { t, useI18n } from "@/app/il8n";
 
 const inputClass =
   "w-full rounded-2xl border border-stone-200 bg-stone-50/80 pl-11 pr-4 py-3.5 text-[14px] text-stone-800 placeholder:text-stone-400 outline-none transition-all focus:border-[#ffa71c] focus:bg-white focus:shadow-[0_0_0_4px_rgba(255,167,28,0.12)]";
 
 export default function RegisterPage() {
+  const { language } = useI18n();
   const router = useRouter();
   const {
     register,
@@ -32,8 +34,8 @@ export default function RegisterPage() {
       setToken(res.data.token);
       localStorage.setItem("token", res.data.token);
       toast.add({
-        title: "Account created",
-        description: "Welcome! Your account is ready to use.",
+        title: t("toast.registerSuccessTitle"),
+        description: t("toast.registerSuccessDescription"),
         type: "success",
         timeout: 2000,
       });
@@ -41,10 +43,9 @@ export default function RegisterPage() {
     } catch (err) {
       console.error(err);
       toast.add({
-        title: "Registration failed",
+        title: t("toast.registerFailureTitle"),
         description:
-          err?.response?.data?.message ||
-          "Unable to create an account. Try again.",
+          err?.response?.data?.message || t("toast.registerFailureDescription"),
         type: "error",
         timeout: 2000,
       });
@@ -66,14 +67,14 @@ export default function RegisterPage() {
               Flavoriz
             </p>
             <p className="mt-2 text-sm text-stone-500">
-              Create your account and start cooking.
+              {t("auth.registerTitle")}
             </p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
             <div>
               <label className="mb-1.5 block text-[13px] font-semibold text-stone-700">
-                Name
+                {t("auth.name")}
               </label>
               <div className="relative">
                 <User
@@ -82,7 +83,7 @@ export default function RegisterPage() {
                 />
                 <input
                   {...register("name")}
-                  placeholder="Noor"
+                  placeholder={t("auth.namePlaceholder")}
                   className={inputClass}
                 />
               </div>
@@ -93,7 +94,7 @@ export default function RegisterPage() {
 
             <div>
               <label className="mb-1.5 block text-[13px] font-semibold text-stone-700">
-                Email
+                {t("auth.email")}
               </label>
               <div className="relative">
                 <Mail
@@ -103,7 +104,7 @@ export default function RegisterPage() {
                 <input
                   type="email"
                   {...register("email")}
-                  placeholder="you@example.com"
+                  placeholder={t("auth.emailPlaceholder")}
                   className={inputClass}
                 />
               </div>
@@ -114,7 +115,7 @@ export default function RegisterPage() {
 
             <div>
               <label className="mb-1.5 block text-[13px] font-semibold text-stone-700">
-                Password
+                {t("auth.password")}
               </label>
               <div className="relative">
                 <Lock
@@ -124,7 +125,7 @@ export default function RegisterPage() {
                 <input
                   type="password"
                   {...register("password")}
-                  placeholder="Create a password"
+                  placeholder={t("auth.createPassword")}
                   className={inputClass}
                 />
               </div>
@@ -137,18 +138,18 @@ export default function RegisterPage() {
               type="submit"
               className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#ffa71c] py-3.5 text-[14.5px] font-semibold text-stone-900 transition-all hover:bg-[#ff9c00]"
             >
-              Create account
+              {t("auth.createAccount")}
               <ArrowRight size={16} />
             </button>
           </form>
 
           <p className="mt-6 text-center text-[13.5px] text-stone-500">
-            Already have an account?{" "}
+            {t("auth.alreadyHaveAccount")} {""}
             <Link
               href="/login"
               className="font-semibold text-[#a95f00] transition-colors hover:text-stone-900"
             >
-              Log in
+              {t("auth.signIn")}
             </Link>
           </p>
         </div>

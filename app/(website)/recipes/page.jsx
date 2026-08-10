@@ -2,10 +2,8 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
-  Eye,
   ArrowUpRight,
   Search,
-  ChevronDown,
   ChefHat,
   Soup,
   Sandwich,
@@ -15,36 +13,52 @@ import {
   IceCreamCone,
   HeartPulse,
   Zap,
-  ChevronLeft,
-  ChevronRight,
-  Menu,
-  X,
-  Heart,
   Clock,
   Gauge,
   Star,
 } from "lucide-react";
+import { t, useI18n } from "@/app/il8n";
 import axios from "axios";
 import Image from "next/image";
 import { SkeletonCard } from "@/app/skeleton/SkeletonCard";
 
 const LINKS = [
-  { label: "Home", active: false },
-  { label: "Recipes", active: true },
-  { label: "Blog", active: false },
-  { label: "Contact", active: false },
+  { labelKey: "nav.home", active: false },
+  { labelKey: "nav.recipes", active: true },
+  { labelKey: "nav.blog", active: false },
+  { labelKey: "nav.contact", active: false },
 ];
 
 const CATEGORIES = [
-  { label: "All Types", icon: ChefHat },
-  { label: "Appetizers", icon: Sandwich },
-  { label: "Main Courses", icon: Soup },
-  { label: "Salads & Sides", icon: Salad },
-  { label: "Vegetarian", icon: Leaf },
-  { label: "International", icon: Globe2 },
-  { label: "Desserts", icon: IceCreamCone },
-  { label: "Healthy Eats", icon: HeartPulse },
-  { label: "Quick & Easy", icon: Zap },
+  { value: "all", labelKey: "recipes.filters.allTypes", icon: ChefHat },
+  {
+    value: "appetizers",
+    labelKey: "recipes.filters.appetizers",
+    icon: Sandwich,
+  },
+  { value: "mainCourses", labelKey: "recipes.filters.mainCourses", icon: Soup },
+  {
+    value: "saladsSides",
+    labelKey: "recipes.filters.saladsSides",
+    icon: Salad,
+  },
+  { value: "vegetarian", labelKey: "recipes.filters.vegetarian", icon: Leaf },
+  {
+    value: "international",
+    labelKey: "recipes.filters.international",
+    icon: Globe2,
+  },
+  {
+    value: "desserts",
+    labelKey: "recipes.filters.desserts",
+    icon: IceCreamCone,
+  },
+  {
+    value: "healthyEats",
+    labelKey: "recipes.filters.healthyEats",
+    icon: HeartPulse,
+  },
+  { value: "quickEasy", labelKey: "recipes.filters.quickEasy", icon: Zap },
 ];
 
 const RECIPES = [
@@ -109,10 +123,12 @@ const RECIPES = [
 ];
 
 export default function RecipesPage() {
-  const [active, setActive] = useState("All Types");
+  const [active, setActive] = useState("all");
   const [query, setQuery] = useState("");
   const [recipes, setRecipes] = useState([]);
   const [load, setLoad] = useState(false);
+  const [category, setCategory] = useState([]);
+  const { language } = useI18n();
 
   useEffect(() => {
     setLoad(true);
@@ -123,14 +139,56 @@ export default function RecipesPage() {
         setRecipes(response.data);
         setLoad(false);
       }
+      async function fetchCategory() {
+        await axios.get("http://localhost:5000/api/v1/category").then((res) => {
+          setCategory(res.data);
+        });
+      }
+      fetchCategory();
       fetchRecipes();
     } catch (error) {
       console.error("Error fetching recipes:", error);
     }
   }, [active, query]);
 
+  const showCategory = category.map((cat) => {
+    const isActive = active === cat.name;
+    return (
+      <div key={cat._id} className="flex flex-wrap gap-2.5 mb-10">
+        <button
+          className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-[13px] font-medium whitespace-nowrap border transition-colors ${
+            isActive
+              ? "bg-stone-900 text-white border-stone-900"
+              : "bg-white text-stone-500 border-stone-200 hover:border-[#ffa71c]/50 hover:text-stone-800"
+          }`}
+        >
+          <ChefHat
+            size={14}
+            className={isActive ? "text-[#ffa71c]" : "text-stone-400"}
+          />
+          All Type
+        </button>
+        <button
+          onClick={() => {
+            setActive(cat.name);
+          }}
+          className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-[13px] font-medium whitespace-nowrap border transition-colors ${
+            isActive
+              ? "bg-stone-900 text-white border-stone-900"
+              : "bg-white text-stone-500 border-stone-200 hover:border-[#ffa71c]/50 hover:text-stone-800"
+          }`}
+        >
+          {/* <Icon
+            size={14}
+            className={isActive ? "text-[#ffa71c]" : "text-stone-400"}
+          /> */}
+          {t(cat.name)}
+        </button>
+      </div>
+    );
+  });
+
   const showRecipes = recipes.map((recipe) => {
-    const categoryLabel = recipe.category || "Uncategorized";
     return (
       <div
         key={recipe._id}
@@ -172,7 +230,7 @@ export default function RecipesPage() {
               href={`/recipedetails/${recipe._id}`}
               className="inline-flex items-center gap-2 rounded-full bg-stone-900 px-4 py-1.5 text-[12.5px] font-semibold text-white transition-colors hover:bg-black"
             >
-              See Complete Recipe
+              {t("recipes.seeCompleteRecipe")}
               <ArrowUpRight size={14} />
             </Link>
           </div>
@@ -191,13 +249,14 @@ export default function RecipesPage() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-8">
           <div>
             <div className="inline-flex items-center gap-1.5 text-[11.5px] font-semibold text-[#a95f00] bg-[#ffa71c]/15 px-3 py-1 rounded-full mb-3">
-              <ChefHat size={13} /> {recipes.length} recipes found
+              <ChefHat size={13} />{" "}
+              {t("recipes.recipesFound", { count: recipes.length })}
             </div>
             <h1
               className="text-[28px] sm:text-[34px] leading-tight text-stone-900"
               style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 700 }}
             >
-              All <span className="text-[#ffa71c]">Recipes</span>
+              {t("recipes.title")}
             </h1>
           </div>
 
@@ -209,37 +268,41 @@ export default function RecipesPage() {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search recipes..."
+              placeholder={t("recipes.searchPlaceholder")}
               className="w-full rounded-full bg-white border border-stone-200 focus:border-[#ffa71c]/50 pl-10 pr-4 py-2.5 text-[13px] outline-none transition-colors placeholder:text-stone-400"
             />
           </div>
         </div>
 
         {/* Category pills */}
-        <div className="flex flex-wrap gap-2.5 mb-10">
-          {CATEGORIES.map(({ label, icon: Icon }) => {
-            const isActive = active === label;
-            return (
-              <button
-                key={label}
-                onClick={() => {
-                  setActive(label);
-                }}
-                className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-[13px] font-medium whitespace-nowrap border transition-colors ${
-                  isActive
-                    ? "bg-stone-900 text-white border-stone-900"
-                    : "bg-white text-stone-500 border-stone-200 hover:border-[#ffa71c]/50 hover:text-stone-800"
-                }`}
-              >
-                <Icon
-                  size={14}
-                  className={isActive ? "text-[#ffa71c]" : "text-stone-400"}
-                />
-                {label}
-              </button>
-            );
-          })}
-        </div>
+        {category.length > 0 ? (
+          showCategory
+        ) : (
+          <div className="flex flex-wrap gap-2.5 mb-10">
+            {CATEGORIES.map(({ value, labelKey, icon: Icon }) => {
+              const isActive = active === value;
+              return (
+                <button
+                  key={value}
+                  onClick={() => {
+                    setActive(value);
+                  }}
+                  className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-[13px] font-medium whitespace-nowrap border transition-colors ${
+                    isActive
+                      ? "bg-stone-900 text-white border-stone-900"
+                      : "bg-white text-stone-500 border-stone-200 hover:border-[#ffa71c]/50 hover:text-stone-800"
+                  }`}
+                >
+                  <Icon
+                    size={14}
+                    className={isActive ? "text-[#ffa71c]" : "text-stone-400"}
+                  />
+                  {t(labelKey)}
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {/* Grid */}
         {recipes.length > 0 ? (
@@ -258,7 +321,7 @@ export default function RecipesPage() {
               <ChefHat size={22} className="text-[#a95f00]" />
             </span>
             <p className="text-stone-500 text-[14px]">
-              No recipes match your search.
+              {t("recipes.noResults")}
             </p>
           </div>
         )}

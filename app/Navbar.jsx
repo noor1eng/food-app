@@ -5,18 +5,24 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Logout from "./(auth)/Logout";
 import { useAuth } from "./context/token";
+import { t, useI18n } from "@/app/il8n";
 
 const LINKS = [
-  { label: "Home", href: "/" },
-  { label: "Recipes", href: "/recipes" },
-  { label: "Favorites", href: "/favorites" },
+  { labelKey: "nav.home", href: "/" },
+  { labelKey: "nav.recipes", href: "/recipes" },
+  { labelKey: "nav.favorites", href: "/favorites" },
 ];
 
 export default function Navbar() {
-  const { token } = useAuth();
+  const { token, setToken } = useAuth();
   const pathname = usePathname();
   const [lang, setLang] = useState("en");
   const [open, setOpen] = useState(false);
+  const { language, changeLanguage } = useI18n();
+
+  React.useEffect(() => {
+    setLang(language);
+  }, [language]);
 
   // "/" should only be active on an exact match, otherwise every route
   // would match it as a prefix. Other links match by prefix so nested
@@ -42,11 +48,11 @@ export default function Navbar() {
 
           {/* Desktop nav */}
           <nav className="hidden lg:flex items-center gap-1">
-            {LINKS.map(({ label, href }) => {
+            {LINKS.map(({ labelKey, href }) => {
               const active = isActive(href);
               return (
                 <Link
-                  key={label}
+                  key={labelKey}
                   href={href}
                   className={`relative px-4 py-2 text-[13px] font-semibold uppercase tracking-wide transition-colors rounded-full ${
                     active
@@ -54,7 +60,7 @@ export default function Navbar() {
                       : "text-stone-400 hover:text-stone-700"
                   }`}
                 >
-                  {label}
+                  {t(labelKey)}
                 </Link>
               );
             })}
@@ -70,25 +76,49 @@ export default function Navbar() {
                   className="flex sm:inline-flex items-center gap-1.5 text-[13px] font-semibold text-stone-600 hover:text-stone-900 px-3.5 py-2 rounded-full hover:bg-stone-100 transition-colors"
                 >
                   <LayoutDashboard size={15} />
-                  Dashboard
+                  {t("nav.dashboard")}
                 </Link>
 
                 <Logout />
+                <button
+                  onClick={() => {
+                    const nextLang = lang === "en" ? "ar" : "en";
+                    changeLanguage(nextLang);
+                    setLang(nextLang);
+                  }}
+                  className="inline-flex items-center gap-1.5 border border-stone-200 text-stone-500 text-[12px] font-semibold px-3 py-2 rounded-full hover:bg-stone-50 hover:border-stone-300 transition-colors shrink-0"
+                  aria-label="Toggle language"
+                >
+                  <Languages size={14} className="text-stone-400" />
+                  <span>{lang === "en" ? "EN" : "AR"}</span>
+                </button>
               </>
             ) : (
               <>
                 {/* Guest state */}
                 <Link href={"/login"}>
                   <button className="hidden sm:inline-flex items-center text-[13px] font-semibold text-stone-600 hover:text-stone-900 px-3.5 py-2 rounded-full hover:bg-stone-100 transition-colors">
-                    Sign In
+                    {t("nav.signIn")}
                   </button>
                 </Link>
 
                 <Link href={"/register"}>
                   <button className="inline-flex items-center gap-1.5 bg-[#ffa71c] text-stone-900 text-[13px] font-semibold px-4 sm:px-5 py-2 rounded-full hover:bg-[#ff9c00] shadow-[0_8px_18px_-8px_rgba(255,167,28,0.6)] transition-colors">
-                    Sign Up
+                    {t("nav.signUp")}
                   </button>
                 </Link>
+                <button
+                  onClick={() => {
+                    const nextLang = lang === "en" ? "ar" : "en";
+                    changeLanguage(nextLang);
+                    setLang(nextLang);
+                  }}
+                  className="inline-flex items-center gap-1.5 border border-stone-200 text-stone-500 text-[12px] font-semibold px-3 py-2 rounded-full hover:bg-stone-50 hover:border-stone-300 transition-colors shrink-0"
+                  aria-label="Toggle language"
+                >
+                  <Languages size={14} className="text-stone-400" />
+                  <span>{lang === "en" ? "EN" : "AR"}</span>
+                </button>
               </>
             )}
 
@@ -109,18 +139,18 @@ export default function Navbar() {
           }`}
         >
           <nav className="flex flex-col px-5 py-3">
-            {LINKS.map(({ label, href }) => {
+            {LINKS.map(({ labelKey, href }) => {
               const active = isActive(href);
               return (
                 <Link
-                  key={label}
+                  key={labelKey}
                   href={href}
                   onClick={() => setOpen(false)}
                   className={`py-3 text-[14px] font-semibold uppercase tracking-wide border-b border-stone-100 flex items-center justify-between ${
                     active ? "text-stone-900" : "text-stone-400"
                   }`}
                 >
-                  {label}
+                  {t(labelKey)}
                   {active && (
                     <span className="w-1.5 h-1.5 rounded-full bg-[#ffa71c]" />
                   )}
@@ -140,19 +170,29 @@ export default function Navbar() {
                         className="text-[11.5px] text-stone-400 inline-flex items-center gap-1 hover:text-stone-600 transition-colors"
                       >
                         <LayoutDashboard size={11} />
-                        Dashboard
+                        {t("nav.dashboard")}
                       </Link>
                     </div>
                   </div>
 
-                  <LogOut size={13} />
+                  <LogOut
+                    size={13}
+                    onClick={() => {
+                      setToken(null);
+                      localStorage.removeItem("token");
+                    }}
+                  />
                 </div>
               ) : (
                 // ── Guest ──────────────────────────────────────
                 <div className="flex items-center gap-2 mt-4">
                   {/* زر الترجمة */}
                   <button
-                    onClick={() => setLang(lang === "en" ? "ar" : "en")}
+                    onClick={() => {
+                      const nextLang = lang === "en" ? "ar" : "en";
+                      changeLanguage(nextLang);
+                      setLang(nextLang);
+                    }}
                     className="inline-flex items-center gap-1.5 border border-stone-200 text-stone-500 text-[12px] font-semibold px-3 py-2 rounded-full hover:bg-stone-50 hover:border-stone-300 transition-colors shrink-0"
                     aria-label="Toggle language"
                   >
@@ -163,14 +203,14 @@ export default function Navbar() {
                   {/* Sign In */}
                   <Link href="/login" className="flex-1 min-w-0">
                     <button className="w-full rounded-full border border-stone-200 text-stone-700 text-[13px] font-semibold py-2.5 px-4 hover:bg-stone-50 transition-colors whitespace-nowrap">
-                      Sign In
+                      {t("nav.signIn")}
                     </button>
                   </Link>
 
                   {/* Sign Up */}
                   <Link href="/register" className="flex-1 min-w-0">
                     <button className="w-full rounded-full bg-[#ffa71c] text-stone-900 text-[13px] font-semibold py-2.5 px-4 hover:bg-[#ff9c00] transition-colors whitespace-nowrap">
-                      Sign Up
+                      {t("nav.signUp")}
                     </button>
                   </Link>
                 </div>

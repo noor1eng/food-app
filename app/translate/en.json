@@ -1,0 +1,202 @@
+{
+  "nav": {
+    "home": "Home",
+    "recipes": "Recipes",
+    "favorites": "Favorites",
+    "blog": "Blog",
+    "contact": "Contact",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Logout",
+    "menu": "Menu",
+    "dashboard": "Dashboard",
+    "myRecipes": "My Recipes",
+    "addRecipe": "Add Recipe",
+    "category": "Category"
+  },
+
+  "home": {
+    "title": "Explore Culinary Insights",
+    "addRecipe": "Add Recipe",
+    "whatToCook": "What to Cook?",
+    "viewAllRecipes": "View All Recipes",
+    "recipesFound": "{{count}} recipes found",
+    "noRecipes": "No recipes to show",
+    "noRecipesDescription": "There's nothing here yet. Recipes you add will show up in this list."
+  },
+
+  "recipes": {
+    "title": "All Recipes",
+    "searchPlaceholder": "Search recipes...",
+    "seeCompleteRecipe": "See complete recipe",
+    "noResults": "No recipes match your search.",
+    "filters": {
+      "allTypes": "All Types",
+      "appetizers": "Appetizers",
+      "mainCourses": "Main Courses",
+      "saladsSides": "Salads & Sides",
+      "vegetarian": "Vegetarian",
+      "international": "International",
+      "desserts": "Desserts",
+      "healthyEats": "Healthy Eats",
+      "quickEasy": "Quick & Easy"
+    }
+  },
+
+  "favorites": {
+    "title": "Favorites",
+    "savedRecipes": "{{count}} recipes you've saved",
+    "emptyTitle": "No favorites yet",
+    "emptyDescription": "Recipes you save will show up here. Start exploring and tap the heart icon on any recipe you love.",
+    "emptyMessage": "Recipes you love, all in one place",
+    "browseRecipes": "Browse Recipes",
+    "removeFromFavorites": "Remove from favorites"
+  },
+
+  "auth": {
+    "brand": "Flavoriz",
+    "loginTitle": "Welcome back. Sign in to continue.",
+    "registerTitle": "Create your account and start cooking.",
+    "name": "Name",
+    "namePlaceholder": "Noor",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "passwordPlaceholder": "••••••••",
+    "createPassword": "Create a password",
+    "login": "Log in",
+    "createAccount": "Create account",
+    "noAccount": "Don’t have an account?",
+    "alreadyHaveAccount": "Already have an account?",
+    "signUp": "Create one",
+    "signIn": "Log in"
+  },
+
+  "toast": {
+    "loginSuccessTitle": "Welcome back",
+    "loginSuccessDescription": "You have successfully signed in.",
+    "loginFailureTitle": "Login failed",
+    "loginFailureDescription": "Unable to sign in. Check your credentials.",
+    "registerSuccessTitle": "Account created",
+    "registerSuccessDescription": "Welcome! Your account is ready to use.",
+    "registerFailureTitle": "Registration failed",
+    "registerFailureDescription": "Unable to create an account. Try again."
+  },
+
+  "footer": {
+    "company": "Company",
+    "aboutUs": "About us",
+    "ourStory": "Our story",
+    "careers": "Careers",
+    "press": "Press",
+    "support": "Support",
+    "helpCenter": "Help center",
+    "contactUs": "Contact us",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of service",
+    "explore": "Explore",
+    "allRecipes": "All Recipes",
+    "categories": "Categories",
+    "popularRecipes": "Popular Recipes",
+    "recentlyAdded": "Recently Added",
+    "description": "Discover a world of delicious recipes, kitchen tips, and fresh inspiration for every meal.",
+    "email": "hello@flavoriz.com",
+    "phone": "+1 (555) 123-4567",
+    "location": "123 Flavor St, Culinary City",
+    "copyright": "© 2026 Flavoriz. All rights reserved."
+  },
+
+  "dashboard": {
+    "greeting": "Good morning, {{name}} 👋",
+    "stats": {
+      "totalRecipes": "Total Recipes",
+      "thisMonth": "+{{count}} this month",
+      "totalViews": "Total Views",
+      "viewsChange": "+{{percent}}%",
+      "avgRating": "Avg. Rating",
+      "ratingChange": "+{{value}}",
+      "followers": "Followers",
+      "followersChange": "{{percent}}%"
+    }
+  },
+
+  "myRecipes": {
+    "title": "My Recipes",
+    "description": "Manage and organize your recipes",
+    "addRecipe": "Add Recipe",
+    "empty": "No recipes yet. Create the first one to get started.",
+    "newRecipe": "New recipe"
+  },
+
+  "recipeForm": {
+    "title": "Share something delicious",
+    "description": "Shape the story behind your dish with beautiful details, a strong first image, and a clear cooking path.",
+
+    "essentials": {
+      "title": "Recipe essentials",
+      "recipeTitle": "Recipe title",
+      "shortDescription": "Short description",
+      "category": "Category",
+      "selectCategory": "Select category",
+      "cookingTime": "Cooking time",
+      "difficulty": "Difficulty",
+      "selectDifficulty": "Select difficulty",
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    },
+
+    "story": {
+      "title": "Build the recipe story",
+      "ingredients": "Ingredients",
+      "instructions": "Instructions"
+    },
+
+    "coverImage": {
+      "title": "Cover image",
+      "description": "Add a polished first impression",
+      "upload": "Click to upload or drag and drop",
+      "formats": "PNG or JPG, up to 5MB",
+      "photoTipTitle": "Photo tip",
+      "photoTip": "Natural light and a warm angle make dishes feel more inviting. A clean background helps the food stand out."
+    },
+
+    "actions": {
+      "save": "Save Recipe",
+      "cancel": "Cancel"
+    }
+  },
+
+  "categories": {
+    "title": "Categories",
+    "description": "Organize your recipes into beautifully structured collections",
+    "addCategory": "Add Category",
+    "empty": "No categories yet. Create the first one to get started.",
+    "newCategory": "New category",
+
+    "form": {
+      "title": "Add a fresh collection",
+      "categoryName": "Category name",
+      "description": "Description",
+      "cancel": "Cancel",
+      "save": "Save category",
+      "coverImage": "Cover image",
+      "upload": "Click to upload or drag an image",
+      "formats": "PNG or JPG up to 5MB",
+      "preview": "Your category image will appear here before you save it."
+    }
+  },
+  "recipeDetails": {
+    "about": "About this recipe",
+    "instructions": "Instructions",
+    "ingredients": "Ingredients",
+    "rateRecipe": "Rate this recipe",
+    "reviews": "Reviews & Comments",
+    "reviewsCount": "{{count}} reviews",
+    "yourRating": "Your rating",
+    "shareThoughts": "Share your thoughts on this recipe...",
+    "postComment": "Post Comment",
+    "views": "Views",
+    "helpful": "Helpful"
+  }
+}

@@ -15,6 +15,8 @@ import {
 import { useParams } from "next/navigation";
 import axios from "axios";
 import Image from "next/image";
+import { t, useI18n } from "@/app/il8n";
+import { toast } from "@/components/ui/toast";
 
 // const RECIPE = {
 //   title: "Creamy Chicken Pasta",
@@ -110,6 +112,7 @@ export default function RecipeDetailsPage() {
   const [userRating, setUserRating] = useState(0);
   const [recipe, setRecipe] = useState([]);
   const [saved, setSaved] = useState(false);
+  const { language } = useI18n();
   const id = useParams().id; // Assuming you have a way to get the recipe ID from the URL
 
   useEffect(() => {
@@ -151,21 +154,19 @@ export default function RecipeDetailsPage() {
   };
 
   async function handleEditFavorate(id) {
-    const formData = new FormData();
-    formData.append("title", recipe.title);
-    formData.append("description", recipe.description);
-    formData.append("category", recipe.category);
-    formData.append("time", recipe.time);
-    formData.append("difficulty", recipe.difficulty);
-    formData.append("ingrediaint", recipe.ingrediaint);
-    formData.append("instructions", recipe.instructions);
-    formData.append("favorate", true);
     try {
       await axios
-        .put(`http://localhost:5000/api/v1/recipe/${id}`, formData)
+        .put(`http://localhost:5000/api/v1/recipe/${id}/favorate`)
         .then((res) => {
           console.log(res.data);
+          setSaved((prev) => !prev);
         });
+      toast.add({
+        title: "added to favorate",
+        description: "Your recipe has been added to favorte",
+        type: "success",
+        timeout: 2000,
+      });
     } catch (err) {
       console.log(err);
     }
@@ -200,11 +201,11 @@ export default function RecipeDetailsPage() {
                 onClick={() => handleEditFavorate(recipe._id)}
                 className={`w-9 h-9 rounded-full flex items-center justify-center backdrop-blur transition-colors ${
                   saved
-                    ? "bg-[#ffa71c] text-stone-900"
+                    ? "bg-red-500 text-white"
                     : "bg-white/90 text-stone-700 hover:bg-white"
                 }`}
               >
-                <Heart size={16} className={saved ? "fill-stone-900" : ""} />
+                <Heart size={16} className={saved ? "fill-white" : ""} />
               </button>
             </div>
           </div>
@@ -230,12 +231,15 @@ export default function RecipeDetailsPage() {
             <Gauge size={15} className="text-stone-400" /> {recipe.difficulty}
           </span>
           <span className="inline-flex items-center gap-1.5 text-[13px] text-stone-600">
-            <Eye size={15} className="text-stone-400" /> views
+            <Eye size={15} className="text-stone-400" />{" "}
+            {t("recipeDetails.views")}
           </span>
           <span className="inline-flex items-center gap-1.5 text-[13px] text-stone-600">
             <StarRating value={Number(avgRating)} size={14} />
             <span className="font-semibold text-stone-800">{avgRating}</span>
-            <span className="text-stone-400">({comments.length} reviews)</span>
+            <span className="text-stone-400">
+              ({t("recipeDetails.reviewsCount", { count: comments.length })})
+            </span>
           </span>
         </div>
 
@@ -248,7 +252,7 @@ export default function RecipeDetailsPage() {
                 className="text-[19px] text-stone-900 mb-3"
                 style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 700 }}
               >
-                About this recipe
+                {t("recipeDetails.about")}
               </h2>
               <p className="text-[14.5px] text-stone-600 leading-relaxed">
                 {recipe.description}
@@ -260,7 +264,7 @@ export default function RecipeDetailsPage() {
                 className="text-[19px] text-stone-900 mb-4"
                 style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 700 }}
               >
-                Instructions
+                {t("recipeDetails.instructions")}
               </h2>
               <ol className="space-y-4">
                 <li className="flex gap-4">
@@ -280,7 +284,7 @@ export default function RecipeDetailsPage() {
                 className="text-[16px] text-stone-900 mb-4"
                 style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 700 }}
               >
-                Ingredients
+                {t("recipeDetails.ingredients")}
               </h3>
               <ul className="space-y-2.5">
                 <li className="flex items-start gap-2.5">
@@ -293,7 +297,9 @@ export default function RecipeDetailsPage() {
 
               <div className="mt-6 pt-5 border-t border-stone-100 flex items-center justify-between">
                 <div>
-                  <p className="text-[11px] text-stone-400">Rate this recipe</p>
+                  <p className="text-[11px] text-stone-400">
+                    {t("recipeDetails.rateRecipe")}
+                  </p>
                   <StarRating
                     value={userRating}
                     onChange={setUserRating}
@@ -315,7 +321,7 @@ export default function RecipeDetailsPage() {
               className="text-[20px] text-stone-900"
               style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 700 }}
             >
-              Reviews & Comments
+              {t("recipeDetails.reviews")}
             </h2>
             <span className="text-[13px] text-stone-400">
               ({comments.length})
@@ -329,7 +335,7 @@ export default function RecipeDetailsPage() {
           >
             <div className="flex items-center justify-between mb-3">
               <label className="text-[13px] font-semibold text-stone-700">
-                Your rating
+                {t("recipeDetails.yourRating")}
               </label>
               <StarRating
                 value={userRating}
@@ -341,7 +347,7 @@ export default function RecipeDetailsPage() {
             <textarea
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
-              placeholder="Share your thoughts on this recipe..."
+              placeholder={t("recipeDetails.shareThoughts")}
               rows={3}
               className="w-full rounded-xl border border-stone-200 bg-stone-50/60 px-3.5 py-2.5 text-[13.5px] text-stone-800 placeholder:text-stone-400 outline-none transition-all focus:bg-white focus:border-[#ffa71c] focus:ring-4 focus:ring-[#ffa71c]/10 resize-none"
             />
@@ -351,7 +357,7 @@ export default function RecipeDetailsPage() {
                 disabled={!commentText.trim() || userRating === 0}
                 className="inline-flex items-center gap-1.5 bg-[#ffa71c] text-stone-900 text-[13px] font-semibold px-5 py-2.5 rounded-full hover:bg-[#ff9c00] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                Post Comment <Send size={13} />
+                {t("recipeDetails.postComment")} <Send size={13} />
               </button>
             </div>
           </form>
@@ -389,7 +395,8 @@ export default function RecipeDetailsPage() {
                 </p>
 
                 <button className="inline-flex items-center gap-1.5 text-[12px] text-stone-400 hover:text-[#a95f00] transition-colors mt-3.5">
-                  <ThumbsUp size={13} /> Helpful ({c.likes})
+                  <ThumbsUp size={13} /> {t("recipeDetails.helpful")} ({c.likes}
+                  )
                 </button>
               </div>
             ))}

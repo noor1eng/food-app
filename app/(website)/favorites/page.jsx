@@ -14,11 +14,13 @@ import {
   HeartOff,
   ChefHat,
 } from "lucide-react";
+import { t, useI18n } from "@/app/il8n";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
-import { de, id } from "zod/locales";
+import { de, fa, id } from "zod/locales";
 import { SkeletonCard } from "@/app/skeleton/SkeletonCard";
+import { toast } from "@/components/ui/toast";
 
 const NAV_ITEMS = [
   { label: "Dashboard", icon: LayoutGrid },
@@ -79,15 +81,14 @@ function EmptyState() {
         className="text-[19px] text-stone-900 mb-2"
         style={{ fontFamily: "'Fraunces', serif" }}
       >
-        No favorites yet
+        {t("favorites.emptyTitle")}
       </h3>
       <p className="text-stone-500 text-[13.5px] max-w-xs mb-6">
-        Recipes you save will show up here. Start exploring and tap the heart
-        icon on any recipe you love.
+        {t("favorites.emptyDescription")}
       </p>
       <Link href={"/recipes"}>
         <button className="inline-flex items-center gap-1.5 bg-[#ffa71c] text-stone-900 text-[13.5px] font-semibold px-5 py-2.5 rounded-xl hover:bg-[#ff9c00] shadow-[0_8px_20px_-8px_rgba(255,167,28,0.6)] transition-colors">
-          <ChefHat size={15} /> Browse Recipes
+          <ChefHat size={15} /> {t("favorites.browseRecipes")}
         </button>
       </Link>
     </div>
@@ -97,8 +98,9 @@ function EmptyState() {
 export default function FavoritesPage() {
   const [favorites, setFavorites] = useState(INITIAL_FAVORITES);
   const [favorateRecipe, setFavorte] = useState([]);
-  const [del, setDelete] = useState(false);
   const [load, setLoad] = useState(false);
+  const [render, setRender] = useState(false);
+  const { language } = useI18n();
 
   useEffect(() => {
     setLoad(true);
@@ -118,22 +120,22 @@ export default function FavoritesPage() {
       }
     }
     fetchRecipe();
-  }, []);
+  }, [render]);
 
-  const handleRemove = async () => {
-    setDelete(true);
+  const handleRemove = async (id) => {
     try {
-      if (del) {
-        // await axios
-        //   .put(
-        //     `http://localhost:5000/api/v1/recipe/${id}`,
-        //     (favorateRecipe.favorate = false),
-        //   )
-        //   .then((res) => {
-        //     console.log(res.data);
-        //   });
-        // console.log(favorateRecipe);
-      }
+      await axios
+        .patch(`http://localhost:5000/api/v1/recipe/${id}/favorate`)
+        .then((res) => {
+          console.log(res.data);
+          setRender((prev) => !prev);
+        });
+      toast.add({
+        title: "removed from favorate",
+        description: "Your recipe has been removed",
+        type: "success",
+        timeout: 2000,
+      });
     } catch (err) {
       console.log(err);
     }
@@ -159,8 +161,8 @@ export default function FavoritesPage() {
           </span>
           <button
             onClick={() => handleRemove(favrecipe._id)}
-            title="Remove from favorites"
-            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-[#ffa71c] hover:bg-red-500 hover:text-white transition-colors"
+            title={t("favorites.removeFromFavorites")}
+            className="absolute top-3 right-3 w-8 h-8 rounded-full backdrop-blur flex items-center justify-center text-[white] hover:bg-white/90 hover:text-orange-300 bg-red-500  transition-colors"
           >
             <Heart size={14} className="fill-current" />
           </button>
@@ -205,14 +207,14 @@ export default function FavoritesPage() {
                   className="text-[28px] text-stone-900"
                   style={{ fontFamily: "'Fraunces', serif" }}
                 >
-                  Favorites
+                  {t("favorites.title")}
                 </h1>
                 <p className="text-stone-500 text-[14px] mt-1">
-                  {favorites.length > 0
-                    ? `${favorites.length} recipe${
-                        favorites.length > 1 ? "s" : ""
-                      } you've saved`
-                    : "Recipes you love, all in one place"}
+                  {favorateRecipe.length > 0
+                    ? t("favorites.savedRecipes", {
+                        count: favorateRecipe.length,
+                      })
+                    : t("favorites.emptyMessage")}
                 </p>
               </div>
             </div>
