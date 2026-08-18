@@ -12,6 +12,7 @@ import axios from "axios";
 import Image from "next/image";
 import { useAuth } from "@/app/context/token";
 import { toast } from "@/components/ui/toast";
+import { t } from "@/app/il8n";
 
 function FieldLabel({ children, hint }) {
   return (
@@ -167,7 +168,7 @@ export default function EditRecipePage() {
             <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
               <div>
                 <div className="inline-flex items-center gap-1.5 text-[11.5px] font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full mb-3">
-                  <CheckCircle2 size={13} /> Editing recipe
+                  <CheckCircle2 size={13} /> {t("dashboard.editRecipe")}
                 </div>
                 <h1
                   className="text-[32px] leading-tight text-stone-900"
@@ -176,8 +177,7 @@ export default function EditRecipePage() {
                   {form.title}
                 </h1>
                 <p className="text-stone-500 text-[14px] mt-1.5">
-                  Update your recipe details, and keep the current cover unless
-                  you replace it.
+                  {t("recipeForm.description")}
                 </p>
               </div>
               <button
@@ -185,7 +185,7 @@ export default function EditRecipePage() {
                 onClick={() => router.push("/dashboard/myrecipe")}
                 className="rounded-2xl border border-stone-200 bg-white px-5 py-2.5 text-[13.5px] font-semibold text-stone-700 hover:bg-stone-100 transition"
               >
-                Back to recipes
+                {t("dashboard.backToRecipes")}
               </button>
             </div>
 
@@ -204,7 +204,9 @@ export default function EditRecipePage() {
 
                   <div className="space-y-5">
                     <div>
-                      <FieldLabel>Recipe title</FieldLabel>
+                      <FieldLabel>
+                        {t("recipeForm.essentials.recipeTitle")}
+                      </FieldLabel>
                       <input
                         value={form.title}
                         onChange={(e) => updateField("title", e.target.value)}
@@ -213,7 +215,9 @@ export default function EditRecipePage() {
                     </div>
 
                     <div>
-                      <FieldLabel>Description</FieldLabel>
+                      <FieldLabel>
+                        {t("recipeForm.essentials.shortDescription")}
+                      </FieldLabel>
                       <textarea
                         value={form.description}
                         onChange={(e) =>
@@ -226,7 +230,9 @@ export default function EditRecipePage() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
-                        <FieldLabel>Category</FieldLabel>
+                        <FieldLabel>
+                          {t("recipeForm.essentials.category")}
+                        </FieldLabel>
                         <div className="relative">
                           <select
                             value={form.category}
@@ -235,7 +241,9 @@ export default function EditRecipePage() {
                             }
                             className={inputClass + " appearance-none pr-9"}
                           >
-                            <option value="">Select category</option>
+                            <option value="">
+                              {t("recipeForm.essentials.selectCategory")}
+                            </option>
                             {categoryOptions.map((categoryItem) => (
                               <option
                                 key={categoryItem._id}
@@ -252,7 +260,9 @@ export default function EditRecipePage() {
                         </div>
                       </div>
                       <div>
-                        <FieldLabel>Cooking time</FieldLabel>
+                        <FieldLabel>
+                          {t("recipeForm.essentials.cookingTime")}
+                        </FieldLabel>
                         <div className="relative">
                           <Clock
                             size={15}
@@ -269,7 +279,9 @@ export default function EditRecipePage() {
                         </div>
                       </div>
                       <div>
-                        <FieldLabel>Difficulty</FieldLabel>
+                        <FieldLabel>
+                          {t("recipeForm.essentials.difficulty")}
+                        </FieldLabel>
                         <div className="relative">
                           <select
                             value={form.difficulty}
@@ -278,10 +290,12 @@ export default function EditRecipePage() {
                             }
                             className={inputClass + " appearance-none pr-9"}
                           >
-                            <option value="">Select difficulty</option>
-                            <option>Easy</option>
-                            <option>Medium</option>
-                            <option>Hard</option>
+                            <option value="">
+                              {t("recipeForm.essentials.selectDifficulty")}
+                            </option>
+                            <option>{t("recipeForm.essentials.easy")}</option>
+                            <option>{t("recipeForm.essentials.medium")}</option>
+                            <option>{t("recipeForm.essentials.hard")}</option>
                           </select>
                           <ChevronDown
                             size={15}
@@ -303,7 +317,9 @@ export default function EditRecipePage() {
 
                   <div className="space-y-5">
                     <div>
-                      <FieldLabel>Ingredients</FieldLabel>
+                      <FieldLabel>
+                        {t("recipeForm.story.ingredients")}
+                      </FieldLabel>
                       <textarea
                         value={form.ingrediaint}
                         onChange={(e) =>
@@ -315,7 +331,9 @@ export default function EditRecipePage() {
                       />
                     </div>
                     <div>
-                      <FieldLabel>Instructions</FieldLabel>
+                      <FieldLabel>
+                        {t("recipeForm.story.instructions")}
+                      </FieldLabel>
                       <textarea
                         value={form.instructions}
                         onChange={(e) =>
@@ -406,7 +424,7 @@ export default function EditRecipePage() {
                   onClick={handleSubmit}
                   className="px-6 py-2.5 text-white rounded-xl text-[13.5px] font-semibold bg-[#ffa71c]  hover:bg-[#ff9c00] shadow-[0_8px_20px_-6px_rgba(255,167,28,0.6)] transition-colors"
                 >
-                  Save Recipe
+                  {t("recipeForm.actions.save")}
                 </button>
                 <button
                   type="button"

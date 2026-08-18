@@ -13,6 +13,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/token";
 import { toast } from "@/components/ui/toast";
+import { t } from "@/app/il8n";
 
 function FieldLabel({ children, hint }) {
   return (
@@ -48,7 +49,7 @@ function ImageDropzone({ preview, onSelect, onRemove, fileName }) {
             Cover image
           </h3>
           <p className="text-[11.5px] text-stone-400 mt-1">
-            Add a polished first impression
+            {t("recipeForm.coverImage.description")}
           </p>
         </div>
         {fileName && (
@@ -78,10 +79,10 @@ function ImageDropzone({ preview, onSelect, onRemove, fileName }) {
           <UploadCloud size={20} className="text-[#a95f00]" />
         </div>
         <p className="text-[13.5px] font-medium text-stone-600">
-          Click to upload or drag and drop
+          {t("recipeForm.coverImage.upload")}
         </p>
         <p className="text-[11.5px] text-stone-400 mt-1">
-          PNG or JPG, up to 5MB
+          {t("recipeForm.coverImage.formats")}
         </p>
       </div>
 
@@ -214,17 +215,16 @@ export default function AddRecipePage() {
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <div className="inline-flex items-center gap-1.5 rounded-full bg-[#ffa71c]/15 px-3 py-1 text-[11.5px] font-semibold text-[#a95f00]">
-                <ChefHat size={13} /> New recipe
+                <ChefHat size={13} /> {t("dashboard.newRecipe")}
               </div>
               <h1
                 className="mt-3 text-[32px] leading-tight text-stone-900 sm:text-[36px]"
                 style={{ fontFamily: "'Fraunces', serif" }}
               >
-                Share something delicious
+                {t("recipeForm.title")}
               </h1>
               <p className="mt-2 max-w-2xl text-[14px] leading-6 text-stone-500">
-                Shape the story behind your dish with beautiful details, a
-                strong first image, and a clear cooking path.
+                {t("recipeForm.description")}
               </p>
             </div>
           </div>
@@ -243,13 +243,15 @@ export default function AddRecipePage() {
                   className="text-[15px] font-semibold text-stone-800"
                   style={{ fontFamily: "'Fraunces', serif" }}
                 >
-                  Recipe essentials
+                  {t("recipeForm.essentials.title")}
                 </h3>
               </div>
 
               <div className="space-y-5">
                 <div>
-                  <FieldLabel>Recipe title</FieldLabel>
+                  <FieldLabel>
+                    {t("recipeForm.essentials.recipeTitle")}
+                  </FieldLabel>
                   <input
                     value={form.title}
                     required
@@ -260,7 +262,9 @@ export default function AddRecipePage() {
                 </div>
 
                 <div>
-                  <FieldLabel>Short description</FieldLabel>
+                  <FieldLabel>
+                    {t("recipeForm.essentials.shortDescription")}
+                  </FieldLabel>
                   <textarea
                     value={form.description}
                     onChange={(e) => updateField("description", e.target.value)}
@@ -272,7 +276,9 @@ export default function AddRecipePage() {
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                   <div>
-                    <FieldLabel>Category</FieldLabel>
+                    <FieldLabel>
+                      {t("recipeForm.essentials.category")}
+                    </FieldLabel>
                     <div className="relative">
                       <select
                         value={form.category}
@@ -281,7 +287,9 @@ export default function AddRecipePage() {
                         }
                         className={inputClass + " appearance-none pr-9"}
                       >
-                        <option value="">Select category</option>
+                        <option value="">
+                          {t("recipeForm.essentials.selectCategory")}
+                        </option>
                         {ShowCategories}
                       </select>
                       <ChevronDown
@@ -292,7 +300,9 @@ export default function AddRecipePage() {
                   </div>
 
                   <div>
-                    <FieldLabel>Cooking time</FieldLabel>
+                    <FieldLabel>
+                      {t("recipeForm.essentials.cookingTime")}
+                    </FieldLabel>
                     <div className="relative">
                       <Clock
                         size={15}
@@ -310,7 +320,9 @@ export default function AddRecipePage() {
                   </div>
 
                   <div>
-                    <FieldLabel>Difficulty</FieldLabel>
+                    <FieldLabel>
+                      {t("recipeForm.essentials.difficulty")}
+                    </FieldLabel>
                     <div className="relative">
                       <select
                         value={form.difficulty}
@@ -319,10 +331,12 @@ export default function AddRecipePage() {
                         }
                         className={inputClass + " appearance-none pr-9"}
                       >
-                        <option value="">Select difficulty</option>
-                        <option>Easy</option>
-                        <option>Medium</option>
-                        <option>Hard</option>
+                        <option value="">
+                          {t("recipeForm.essentials.selectDifficulty")}
+                        </option>
+                        <option>{t("recipeForm.essentials.easy")}</option>
+                        <option>{t("recipeForm.essentials.medium")}</option>
+                        <option>{t("recipeForm.essentials.hard")}</option>
                       </select>
                       <ChevronDown
                         size={15}
@@ -341,13 +355,13 @@ export default function AddRecipePage() {
                   className="text-[15px] font-semibold text-stone-800"
                   style={{ fontFamily: "'Fraunces', serif" }}
                 >
-                  Build the recipe story
+                  {t("recipeForm.story.title")}
                 </h3>
               </div>
 
               <div className="space-y-5">
                 <div>
-                  <FieldLabel>Ingredients</FieldLabel>
+                  <FieldLabel>{t("recipeForm.story.ingredients")}</FieldLabel>
                   <textarea
                     value={form.ingrediaint}
                     onChange={(e) => updateField("ingrediaint", e.target.value)}
@@ -358,7 +372,7 @@ export default function AddRecipePage() {
                 </div>
 
                 <div>
-                  <FieldLabel>Instructions</FieldLabel>
+                  <FieldLabel>{t("recipeForm.story.instructions")}</FieldLabel>
                   <textarea
                     value={form.instructions}
                     onChange={(e) =>
@@ -400,7 +414,7 @@ export default function AddRecipePage() {
               form="recipe-form"
               className="rounded-2xl text-white bg-[#ffa71c] px-6 py-2.5 text-[13.5px] font-semibold  shadow-[0_10px_24px_-10px_rgba(255,167,28,0.65)] transition-all hover:bg-[#ff9c00] disabled:cursor-not-allowed disabled:opacity-70"
             >
-              Save Recipe
+              {t("recipeForm.actions.save")}
             </button>
             <button
               type="button"

@@ -17,6 +17,7 @@ import {
   Clock,
   MoreHorizontal,
 } from "lucide-react";
+import { t } from "@/app/il8n";
 
 /* ---------------------------------------------------------
    FLAVORIZ — Dashboard Layout
@@ -26,28 +27,28 @@ import {
 
 const STATS = [
   {
-    label: "Total Recipes",
+    labelKey: "dashboard.stats.totalRecipes",
     value: "48",
     delta: "+4 this month",
     up: true,
     icon: BookOpen,
   },
   {
-    label: "Total Views",
+    labelKey: "dashboard.stats.totalViews",
     value: "12.4k",
     delta: "+18.2%",
     up: true,
     icon: Eye,
   },
   {
-    label: "Avg. Rating",
+    labelKey: "dashboard.stats.avgRating",
     value: "4.8",
     delta: "+0.2",
     up: true,
     icon: Star,
   },
   {
-    label: "Followers",
+    labelKey: "dashboard.stats.followers",
     value: "1,204",
     delta: "-2.1%",
     up: false,
@@ -55,7 +56,7 @@ const STATS = [
   },
 ];
 
-function StatCard({ label, value, delta, up, icon: Icon }) {
+function StatCard({ labelKey, value, delta, up, icon: Icon }) {
   return (
     <div className="bg-white rounded-2xl border border-stone-200/70 p-5">
       <div className="flex items-start justify-between mb-4">
@@ -72,7 +73,7 @@ function StatCard({ label, value, delta, up, icon: Icon }) {
       >
         {value}
       </p>
-      <p className="text-[12.5px] text-stone-400 mt-1.5">{label}</p>
+      <p className="text-[12.5px] text-stone-400 mt-1.5">{t(labelKey)}</p>
       <div
         className={`inline-flex items-center gap-1 text-[11.5px] font-semibold mt-3 px-2 py-0.5 rounded-full ${
           up ? "text-emerald-600 bg-emerald-50" : "text-red-500 bg-red-50"
@@ -85,24 +86,7 @@ function StatCard({ label, value, delta, up, icon: Icon }) {
   );
 }
 
-function StatusPill({ status }) {
-  const styles =
-    status === "Published"
-      ? "bg-emerald-50 text-emerald-600"
-      : "bg-stone-100 text-stone-500";
-  return (
-    <span
-      className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${styles}`}
-    >
-      {status}
-    </span>
-  );
-}
-
 export default function DashboardLayout() {
-  const [active, setActive] = useState("Dashboard");
-  const [notifOpen, setNotifOpen] = useState(false);
-
   return (
     <div
       className="min-h-screen w-full bg-[#f7f7f7] flex rounded-md"
@@ -113,7 +97,7 @@ export default function DashboardLayout() {
         {/* Stats grid */}
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-5">
           {STATS.map((s) => (
-            <StatCard key={s.label} {...s} />
+            <StatCard key={s.labelKey} {...s} />
           ))}
         </div>
       </div>

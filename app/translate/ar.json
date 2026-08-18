@@ -106,8 +106,29 @@
     "copyright": "© 2026 Flavoriz. جميع الحقوق محفوظة."
   },
 
+  "common": {
+    "edit": "تعديل",
+    "delete": "حذف",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "back": "رجوع",
+    "search": "بحث",
+    "published": "منشور",
+    "draft": "مسودة"
+  },
+
   "dashboard": {
+    "brand": "Flavoriz",
+    "menu": "القائمة",
     "greeting": "صباح الخير، {{name}} 👋",
+    "sidebar": {
+      "dashboard": "لوحة التحكم",
+      "myRecipes": "وصفاتي",
+      "addRecipe": "إضافة وصفة",
+      "category": "التصنيف",
+      "logout": "تسجيل الخروج",
+      "menu": "القائمة"
+    },
     "stats": {
       "totalRecipes": "إجمالي الوصفات",
       "thisMonth": "+{{count}} هذا الشهر",
@@ -117,6 +138,16 @@
       "ratingChange": "+{{value}}",
       "followers": "المتابعون",
       "followersChange": "{{percent}}%"
+    },
+    "pageTitle": "لوحة التحكم",
+    "newRecipe": "وصفة جديدة",
+    "editRecipe": "تعديل الوصفة",
+    "backToRecipes": "العودة إلى الوصفات",
+    "status": {
+      "saving": "جارٍ حفظ التغييرات...",
+      "saved": "تم الحفظ بنجاح.",
+      "error": "فشل الحفظ. حاول مرة أخرى.",
+      "idle": "جاهز لحفظ التغييرات."
     }
   },
 

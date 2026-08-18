@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@/app/context/token";
 import { toast } from "@/components/ui/toast";
+import { t } from "@/app/il8n";
 
 /* ---------------------------------------------------------
    FLAVORIZ — My Recipes
@@ -271,10 +272,10 @@ export default function MyRecipesPage() {
                 className="text-[28px] text-stone-900"
                 style={{ fontFamily: "'Fraunces', serif" }}
               >
-                My Recipes
+                {t("myRecipes.title")}
               </h1>
               <p className="text-stone-500 text-[14px] mt-1">
-                Manage and organize your recipes
+                {t("myRecipes.description")}
               </p>
             </div>
 
@@ -286,7 +287,7 @@ export default function MyRecipesPage() {
                   className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400"
                 />
                 <input
-                  placeholder="Search my recipes..."
+                  placeholder={t("recipes.searchPlaceholder")}
                   className="w-full rounded-xl border border-stone-200 bg-white pl-10 pr-4 py-2.5 text-[13.5px] outline-none focus:border-[#ffa71c] focus:ring-4 focus:ring-[#ffa71c]/10 transition-all"
                 />
               </div>
@@ -304,7 +305,7 @@ export default function MyRecipesPage() {
               </div>
               <Link href="/dashboard/addrecipe">
                 <button className="inline-flex items-center justify-center gap-1.5 bg-[#ffa71c] text-stone-900 text-[13.5px] font-semibold px-5 py-2.5 rounded-xl hover:bg-[#ff9c00] shadow-[0_8px_20px_-8px_rgba(255,167,28,0.6)] transition-colors shrink-0">
-                  <PlusCircle size={16} /> Add Recipe
+                  <PlusCircle size={16} /> {t("myRecipes.addRecipe")}
                 </button>
               </Link>
             </div>
@@ -315,7 +316,7 @@ export default function MyRecipesPage() {
                 showRecipes
               ) : (
                 <div className="col-span-full rounded-[24px] border border-dashed border-stone-300 bg-white/70 p-10 text-center text-stone-500">
-                  No recipes yet. Create the first one to get started.
+                  {t("myRecipes.empty")}
                 </div>
               )}
             </div>

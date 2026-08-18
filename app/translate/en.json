@@ -106,8 +106,29 @@
     "copyright": "© 2026 Flavoriz. All rights reserved."
   },
 
+  "common": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "search": "Search",
+    "published": "Published",
+    "draft": "Draft"
+  },
+
   "dashboard": {
+    "brand": "Flavoriz",
+    "menu": "Menu",
     "greeting": "Good morning, {{name}} 👋",
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "myRecipes": "My Recipes",
+      "addRecipe": "Add Recipe",
+      "category": "Category",
+      "logout": "Log out",
+      "menu": "Menu"
+    },
     "stats": {
       "totalRecipes": "Total Recipes",
       "thisMonth": "+{{count}} this month",
@@ -117,6 +138,16 @@
       "ratingChange": "+{{value}}",
       "followers": "Followers",
       "followersChange": "{{percent}}%"
+    },
+    "pageTitle": "Dashboard",
+    "newRecipe": "New recipe",
+    "editRecipe": "Editing recipe",
+    "backToRecipes": "Back to recipes",
+    "status": {
+      "saving": "Saving changes...",
+      "saved": "Saved successfully.",
+      "error": "Save failed. Try again.",
+      "idle": "Ready to save your changes."
     }
   },
 

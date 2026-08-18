@@ -5,6 +5,7 @@ import Link from "next/link";
 import axios from "axios";
 import Image from "next/image";
 import { useAuth } from "@/app/context/token";
+import { t } from "@/app/il8n";
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState([]);
@@ -51,16 +52,16 @@ export default function CategoriesPage() {
               className="text-[28px] text-stone-900 sm:text-[32px]"
               style={{ fontFamily: "'Fraunces', serif" }}
             >
-              Categories
+              {t("categories.title")}
             </h1>
             <p className="mt-1 text-[14px] text-stone-500">
-              Organize your recipes into beautifully structured collections
+              {t("categories.description")}
             </p>
           </div>
 
           <Link href="/dashboard/addcategory">
             <button className="inline-flex items-center gap-1.5 rounded-2xl bg-[#ffa71c] px-5 py-2.5 text-[13.5px] font-semibold text-stone-900 shadow-[0_8px_20px_-8px_rgba(255,167,28,0.6)] transition hover:bg-[#ff9c00]">
-              <PlusCircle size={16} /> Add Category
+              <PlusCircle size={16} /> {t("categories.addCategory")}
             </button>
           </Link>
         </div>
@@ -68,7 +69,7 @@ export default function CategoriesPage() {
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {categories.length === 0 ? (
             <div className="col-span-full rounded-[24px] border border-dashed border-stone-300 bg-white/70 p-10 text-center text-stone-500">
-              No categories yet. Create the first one to get started.
+              {t("categories.empty")}
             </div>
           ) : (
             categories.map((category) => (

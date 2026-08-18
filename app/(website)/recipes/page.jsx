@@ -16,11 +16,13 @@ import {
   Clock,
   Gauge,
   Star,
+  Heart,
 } from "lucide-react";
 import { t, useI18n } from "@/app/il8n";
 import axios from "axios";
 import Image from "next/image";
 import { SkeletonCard } from "@/app/skeleton/SkeletonCard";
+import { toast } from "@/components/ui/toast";
 
 const LINKS = [
   { labelKey: "nav.home", active: false },
@@ -124,53 +126,74 @@ const RECIPES = [
 
 export default function RecipesPage() {
   const [active, setActive] = useState("all");
-  const [query, setQuery] = useState("");
   const [recipes, setRecipes] = useState([]);
+  const [search, setSearch] = useState("");
   const [load, setLoad] = useState(false);
+  const [saved, setSaved] = useState(false);
+
   const [category, setCategory] = useState([]);
+  const [activeCategory, setActiveCategory] = useState(""); // للفلتر — string
   const { language } = useI18n();
 
   useEffect(() => {
     setLoad(true);
     try {
       async function fetchRecipes() {
-        const response = await axios.get("http://localhost:5000/api/v1/recipe");
-        console.log(response.data);
+        const response = await axios.get(
+          "http://localhost:5000/api/v1/recipe",
+          {
+            params: { category: activeCategory, search },
+          },
+        );
         setRecipes(response.data);
         setLoad(false);
       }
+      fetchRecipes();
+    } catch (error) {
+      console.error("Error fetching recipes:", error);
+    }
+  }, [activeCategory, search]);
+
+  useEffect(() => {
+    try {
       async function fetchCategory() {
         await axios.get("http://localhost:5000/api/v1/category").then((res) => {
           setCategory(res.data);
         });
       }
       fetchCategory();
-      fetchRecipes();
-    } catch (error) {
-      console.error("Error fetching recipes:", error);
+    } catch (err) {
+      console.log(err);
     }
-  }, [active, query]);
+  }, []);
+
+  async function handleEditFavorate(id) {
+    try {
+      await axios
+        .put(`http://localhost:5000/api/v1/recipe/${id}/favorate`)
+        .then((res) => {
+          console.log(res.data);
+          setSaved((prev) => !prev);
+        });
+      toast.add({
+        title: "added to favorate",
+        description: "Your recipe has been added to favorte",
+        type: "success",
+        timeout: 2000,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   const showCategory = category.map((cat) => {
     const isActive = active === cat.name;
     return (
-      <div key={cat._id} className="flex flex-wrap gap-2.5 mb-10">
-        <button
-          className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-[13px] font-medium whitespace-nowrap border transition-colors ${
-            isActive
-              ? "bg-stone-900 text-white border-stone-900"
-              : "bg-white text-stone-500 border-stone-200 hover:border-[#ffa71c]/50 hover:text-stone-800"
-          }`}
-        >
-          <ChefHat
-            size={14}
-            className={isActive ? "text-[#ffa71c]" : "text-stone-400"}
-          />
-          All Type
-        </button>
+      <div key={cat._id} className="">
         <button
           onClick={() => {
             setActive(cat.name);
+            setActiveCategory(cat.name);
           }}
           className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-[13px] font-medium whitespace-nowrap border transition-colors ${
             isActive
@@ -178,10 +201,6 @@ export default function RecipesPage() {
               : "bg-white text-stone-500 border-stone-200 hover:border-[#ffa71c]/50 hover:text-stone-800"
           }`}
         >
-          {/* <Icon
-            size={14}
-            className={isActive ? "text-[#ffa71c]" : "text-stone-400"}
-          /> */}
           {t(cat.name)}
         </button>
       </div>
@@ -203,6 +222,20 @@ export default function RecipesPage() {
             className="h-full w-full object-cover"
             loading="eager"
           />
+          <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handleEditFavorate(recipe._id)}
+                className={`w-9 h-9 rounded-full flex items-center justify-center backdrop-blur transition-colors ${
+                  saved
+                    ? "bg-red-500 text-white"
+                    : "bg-white/50 text-stone-700 hover:bg-red-500 hover:text-white"
+                }`}
+              >
+                <Heart size={16} className={saved ? "fill-red-500" : ""} />
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="p-4">
@@ -244,13 +277,15 @@ export default function RecipesPage() {
       className="w-full bg-[#f7f7f7] text-stone-900"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
-      <main className="max-w-7xl mx-auto px-5 sm:px-8 py-10">
+      <main
+        className="max-w-7xl mx-auto px-5 sm:px-8 py-10"
+        style={{ direction: language == "ar" ? "rtl" : "ltr" }}
+      >
         {/* Page header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-8">
           <div>
             <div className="inline-flex items-center gap-1.5 text-[11.5px] font-semibold text-[#a95f00] bg-[#ffa71c]/15 px-3 py-1 rounded-full mb-3">
-              <ChefHat size={13} />{" "}
-              {t("recipes.recipesFound", { count: recipes.length })}
+              <ChefHat size={13} /> {recipes.length}
             </div>
             <h1
               className="text-[28px] sm:text-[34px] leading-tight text-stone-900"
@@ -266,8 +301,8 @@ export default function RecipesPage() {
               className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400"
             />
             <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder={t("recipes.searchPlaceholder")}
               className="w-full rounded-full bg-white border border-stone-200 focus:border-[#ffa71c]/50 pl-10 pr-4 py-2.5 text-[13px] outline-none transition-colors placeholder:text-stone-400"
             />
@@ -276,7 +311,23 @@ export default function RecipesPage() {
 
         {/* Category pills */}
         {category.length > 0 ? (
-          showCategory
+          <div className=" flex flex-wrap gap-2.5 mb-10">
+            <button
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-[13px] font-medium whitespace-nowrap border transition-colors ${
+                active === ""
+                  ? "bg-stone-900 text-white border-stone-900"
+                  : "bg-white text-stone-500 border-stone-200 hover:border-[#ffa71c]/50 hover:text-stone-800"
+              }`}
+              onClick={() => {
+                setActive("");
+                setActiveCategory("");
+              }}
+            >
+              <ChefHat size={14} />
+              All Type
+            </button>
+            {showCategory}
+          </div>
         ) : (
           <div className="flex flex-wrap gap-2.5 mb-10">
             {CATEGORIES.map(({ value, labelKey, icon: Icon }) => {

@@ -4,6 +4,7 @@ import axios from "axios";
 import { ImagePlus, Sparkles, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { t } from "@/app/il8n";
 
 export default function AddCategory() {
   const [form, setForm] = useState({ name: "", description: "" });
@@ -61,13 +62,13 @@ export default function AddCategory() {
         <div className="flex items-center justify-between border-b border-stone-100 bg-[linear-gradient(135deg,_#fff7e8_0%,_#fffdf9_100%)] px-4 py-4 sm:px-6">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-[#ffa71c]/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#a95f00]">
-              <Sparkles size={13} /> New category
+              <Sparkles size={13} /> {t("categories.newCategory")}
             </div>
             <h2
               className="mt-2 text-[22px] text-stone-900 sm:text-[24px]"
               style={{ fontFamily: "'Fraunces', serif" }}
             >
-              Add a fresh collection
+              {t("categories.form.title")}
             </h2>
           </div>
           <button
@@ -85,7 +86,7 @@ export default function AddCategory() {
           <div className="space-y-4 rounded-[24px] border border-stone-200 bg-stone-50/70 p-4 sm:p-5">
             <div>
               <label className="mb-1.5 block text-[13px] font-semibold text-stone-700">
-                Category name
+                {t("categories.form.categoryName")}
               </label>
               <input
                 required
@@ -98,7 +99,7 @@ export default function AddCategory() {
 
             <div>
               <label className="mb-1.5 block text-[13px] font-semibold text-stone-700">
-                Description
+                {t("categories.form.description")}
               </label>
               <input
                 type="text"
@@ -117,14 +118,16 @@ export default function AddCategory() {
                 type="button"
                 className="rounded-2xl border border-stone-200 px-4 py-2.5 text-[13px] font-semibold text-stone-600 transition hover:border-stone-300 hover:text-stone-900"
               >
-                Cancel
+                {t("common.cancel")}
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
                 className="rounded-2xl bg-[#ffa71c] px-4 py-2.5 text-[13px] font-semibold text-stone-900 shadow-[0_10px_24px_-10px_rgba(255,167,28,0.65)] transition hover:bg-[#ff9c00] disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {isSubmitting ? "Saving..." : "Save category"}
+                {isSubmitting
+                  ? t("dashboard.status.saving")
+                  : t("categories.form.save")}
               </button>
             </div>
           </div>
@@ -136,7 +139,7 @@ export default function AddCategory() {
                 className="text-[15px] font-semibold text-stone-800"
                 style={{ fontFamily: "'Fraunces', serif" }}
               >
-                Cover image
+                {t("categories.form.coverImage")}
               </h3>
             </div>
 
@@ -151,10 +154,10 @@ export default function AddCategory() {
                 <ImagePlus size={20} className="text-[#a95f00]" />
               </div>
               <p className="text-[13.5px] font-medium text-stone-700">
-                Click to upload or drag an image
+                {t("categories.form.upload")}
               </p>
               <p className="mt-1 text-[11.5px] text-stone-400">
-                PNG or JPG up to 5MB
+                {t("categories.form.formats")}
               </p>
             </label>
 
@@ -168,7 +171,7 @@ export default function AddCategory() {
               </div>
             ) : (
               <div className="mt-4 rounded-[20px] border border-dashed border-stone-200 bg-stone-50/70 p-4 text-center text-[12.5px] text-stone-400">
-                Your category image will appear here before you save it.
+                {t("categories.form.preview")}
               </div>
             )}
           </div>

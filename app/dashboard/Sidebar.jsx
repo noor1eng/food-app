@@ -15,6 +15,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/token";
+import { t } from "@/app/il8n";
 
 /* ---------------------------------------------------------
    FLAVORIZ — Dashboard Sidebar
@@ -23,14 +24,30 @@ import { useAuth } from "../context/token";
 --------------------------------------------------------- */
 
 const NAV_ITEMS = [
-  { label: "Dashboard", icon: LayoutGrid, href: "/dashboard" },
-  { label: "My Recipes", icon: BookOpen, href: "/dashboard/myrecipe" },
-  { label: "Add Recipe", icon: PlusCircle, href: "/dashboard/addrecipe" },
-  { label: "Category", icon: User, href: "/dashboard/category" },
+  {
+    labelKey: "dashboard.sidebar.dashboard",
+    icon: LayoutGrid,
+    href: "/dashboard",
+  },
+  {
+    labelKey: "dashboard.sidebar.myRecipes",
+    icon: BookOpen,
+    href: "/dashboard/myrecipe",
+  },
+  {
+    labelKey: "dashboard.sidebar.addRecipe",
+    icon: PlusCircle,
+    href: "/dashboard/addrecipe",
+  },
+  {
+    labelKey: "dashboard.sidebar.category",
+    icon: User,
+    href: "/dashboard/category",
+  },
 ];
 
 export default function Sidebar() {
-  const [active, setActive] = useState("Dashboard");
+  const [active, setActive] = useState(t("dashboard.sidebar.dashboard"));
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const [collapsed, setCollapsed] = useState(false);
@@ -123,9 +140,10 @@ export default function Sidebar() {
                 collapsed ? "lg:hidden" : ""
               }`}
             >
-              Menu
+              {t("dashboard.sidebar.menu")}
             </p>
-            {NAV_ITEMS.map(({ label, icon: Icon, badge, href }, index) => {
+            {NAV_ITEMS.map(({ labelKey, icon: Icon, badge, href }, index) => {
+              const label = t(labelKey);
               const isActive = active === label;
               return (
                 <Link
@@ -200,7 +218,7 @@ export default function Sidebar() {
               <button
                 // onClick={handleLogout}
                 className="text-stone-300 hover:text-red-500 transition-colors shrink-0"
-                title="Log out"
+                title={t("dashboard.sidebar.logout")}
               >
                 <LogOut size={15} />
               </button>

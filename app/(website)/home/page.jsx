@@ -89,11 +89,11 @@ const CATEGORIES = [
 
 export default function Hero() {
   const [active, setActive] = useState("all");
-  const [categories, setCategories] = useState([]);
   const [recipes, setRecipes] = useState([]);
   const [load, setLoad] = useState(false);
   const { token } = useAuth();
-  const { language } = useI18n();
+  const { language, changeLanguage } = useI18n();
+  console.log(language);
 
   useEffect(() => {
     setLoad(true);
@@ -103,30 +103,8 @@ export default function Hero() {
         setLoad(false);
       });
     }
-    async function fetchCategories() {
-      await axios.get("http://localhost:5000/api/v1/category").then((res) => {
-        setCategories(res.data);
-      });
-    }
-    fetchCategories();
     fetchRecipes();
   }, []);
-
-  const showCategories = categories?.map((category) => {
-    return (
-      <button
-        key={category._id}
-        onClick={() => setActive(category.name)}
-        className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-[13px] font-medium whitespace-nowrap border transition-colors ${
-          active === category.name
-            ? "bg-stone-900 text-white border-stone-900"
-            : "bg-white text-stone-500 border-stone-200 hover:border-[#ffa71c]/50 hover:text-stone-800"
-        }`}
-      >
-        {category.name}
-      </button>
-    );
-  });
 
   const showRecipes = recipes?.map((recipe) => {
     return (
@@ -248,31 +226,27 @@ export default function Hero() {
 
           {/* Category pills */}
           <div className="flex flex-wrap justify-center gap-2.5 mb-12 px-1">
-            {showCategories
-              ? showCategories
-              : CATEGORIES.map((c, index) => {
-                  const Icon = c.icon;
-                  return (
-                    <button
-                      key={index}
-                      className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-[13px] font-medium whitespace-nowrap border transition-colors ${
-                        active === c.value
-                          ? "bg-stone-900 text-white border-stone-900"
-                          : "bg-white text-stone-500 border-stone-200 hover:border-[#ffa71c]/50 hover:text-stone-800"
-                      }`}
-                    >
-                      <Icon
-                        size={14}
-                        className={
-                          active === c.value
-                            ? "text-[#ffa71c]"
-                            : "text-stone-400"
-                        }
-                      />
-                      {t(c.labelKey)}
-                    </button>
-                  );
-                })}
+            {CATEGORIES.map((c, index) => {
+              const Icon = c.icon;
+              return (
+                <button
+                  key={index}
+                  className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-[13px] font-medium whitespace-nowrap border transition-colors ${
+                    active === c.value
+                      ? "bg-stone-900 text-white border-stone-900"
+                      : "bg-white text-stone-500 border-stone-200 hover:border-[#ffa71c]/50 hover:text-stone-800"
+                  }`}
+                >
+                  <Icon
+                    size={14}
+                    className={
+                      active === c.value ? "text-[#ffa71c]" : "text-stone-400"
+                    }
+                  />
+                  {t(c.labelKey)}
+                </button>
+              );
+            })}
           </div>
 
           {/* Recipe grid */}
