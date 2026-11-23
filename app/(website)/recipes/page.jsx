@@ -17,19 +17,15 @@ import {
   Gauge,
   Star,
   Heart,
+  Images,
+  ListChecks,
 } from "lucide-react";
 import { t, useI18n } from "@/app/il8n";
 import axios from "axios";
 import Image from "next/image";
 import { SkeletonCard } from "@/app/skeleton/SkeletonCard";
 import { toast } from "@/components/ui/toast";
-
-const LINKS = [
-  { labelKey: "nav.home", active: false },
-  { labelKey: "nav.recipes", active: true },
-  { labelKey: "nav.blog", active: false },
-  { labelKey: "nav.contact", active: false },
-];
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 
 const CATEGORIES = [
   { value: "all", labelKey: "recipes.filters.allTypes", icon: ChefHat },
@@ -63,77 +59,33 @@ const CATEGORIES = [
   { value: "quickEasy", labelKey: "recipes.filters.quickEasy", icon: Zap },
 ];
 
-const RECIPES = [
-  {
-    title: "Fresh Salad with Tahini Sauce",
-    views: "250+",
-    category: "Salads & Sides",
-    img: "https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=600&auto=format&fit=crop",
-  },
-  {
-    title: "Chili con Carne with Nachos Chips",
-    views: "150+",
-    category: "Main Courses",
-    img: "https://images.unsplash.com/photo-1606491956689-2ea866880c84?q=80&w=600&auto=format&fit=crop",
-  },
-  {
-    title: "Sour & Spicy Korean Kimchi",
-    views: "200+",
-    category: "International",
-    img: "https://images.unsplash.com/photo-1583224964978-2257b960c3d6?q=80&w=600&auto=format&fit=crop",
-  },
-  {
-    title: "Classic Italian Beef Maltagliati",
-    views: "180+",
-    category: "Main Courses",
-    highlight: true,
-    description:
-      "Layers of spicy goodness, hearty meat, and savory sauce. A timeless favorite with Maltagliati pasta.",
-  },
-  {
-    title: "Flat Noodles with Shrimp Veggie",
-    views: "200+",
-    category: "Main Courses",
-    img: "https://images.unsplash.com/photo-1585032226651-759b368d7246?q=80&w=600&auto=format&fit=crop",
-  },
-  {
-    title: "Cauliflower Steak Chimichurri",
-    views: "150+",
-    category: "Vegetarian",
-    img: "https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=600&auto=format&fit=crop",
-  },
-  {
-    title: "Whip up something sweet",
-    views: "320+",
-    category: "Desserts",
-    highlight: true,
-    description:
-      "A rotating collection of no-fuss desserts, from citrus tarts to spiced cookies — ready in under 30 minutes.",
-  },
-  {
-    title: "Grilled Salmon & Greens",
-    views: "312+",
-    category: "Healthy Eats",
-    img: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?q=80&w=600&auto=format&fit=crop",
-  },
-  {
-    title: "Creamy Chicken Pasta",
-    views: "245+",
-    category: "Main Courses",
-    img: "https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?q=80&w=600&auto=format&fit=crop",
-  },
-];
-
 export default function RecipesPage() {
   const [active, setActive] = useState("all");
   const [recipes, setRecipes] = useState([]);
-  const [search, setSearch] = useState("");
   const [load, setLoad] = useState(false);
   const [saved, setSaved] = useState(false);
-
   const [category, setCategory] = useState([]);
-  const [activeCategory, setActiveCategory] = useState(""); // للفلتر — string
   const { language } = useI18n();
+
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // بدل useState: القيم بتجي من الرابط
+  const search = searchParams.get("search") ?? "";
+  const activeCategory = searchParams.get("category") ?? "";
+
+  // / easy / medium / hard  ->  1 / 2 / 3
+  const LEVELS = { easy: 1, سهل: 1, medium: 2, متوسط: 2, hard: 3, صعب: 3 };
+  const LEVEL_COLOR = ["", "bg-emerald-500", "bg-amber-500", "bg-rose-500"];
+
+  // بدل useState: القيم بتجي من الرابط
+  function setParam(key, value) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value) params.set(key, value);
+    else params.delete(key);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }
 
   useEffect(() => {
     setLoad(true);
@@ -193,7 +145,7 @@ export default function RecipesPage() {
         <button
           onClick={() => {
             setActive(cat.name);
-            setActiveCategory(cat.name);
+            setParam("category", cat.name);
           }}
           className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-[13px] font-medium whitespace-nowrap border transition-colors ${
             isActive
@@ -208,67 +160,125 @@ export default function RecipesPage() {
   });
 
   const showRecipes = recipes.map((recipe) => {
+    console.log(recipe);
+
+    const level = LEVELS[String(recipe.difficulty).trim().toLowerCase()] ?? 2;
+    const categoryName = recipe.category?.name;
     return (
-      <div
+      <article
         key={recipe._id}
-        className="group rounded-2xl border border-stone-200 bg-white overflow-hidden hover:shadow-[0_16px_32px_-16px_rgba(0,0,0,0.15)] transition-shadow"
+        className="group relative flex flex-col overflow-hidden rounded-[28px] border border-stone-200/80 bg-[#FCFAF6] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_40px_-24px_rgba(60,40,10,0.35)]"
       >
+        {/* ───── Cover ───── */}
         <div className="relative aspect-[4/3] overflow-hidden">
           <Image
             src={`http://localhost:5000/images/${encodeURIComponent(recipe.coverImage)}`}
             alt={recipe.title}
             fill
             unoptimized
-            className="h-full w-full object-cover"
-            loading="eager"
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
           />
-          <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => handleEditFavorate(recipe._id)}
-                className={`w-9 h-9 rounded-full flex items-center justify-center backdrop-blur transition-colors ${
-                  saved
-                    ? "bg-red-500 text-white"
-                    : "bg-white/50 text-stone-700 hover:bg-red-500 hover:text-white"
-                }`}
-              >
-                <Heart size={16} className={saved ? "fill-red-500" : ""} />
-              </button>
-            </div>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-950/60 via-transparent to-stone-950/10" />
+
+          {/* category */}
+          {categoryName && (
+            <span className="absolute start-4 top-4 rounded-full bg-[#FCFAF6]/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-800 backdrop-blur">
+              {categoryName}
+            </span>
+          )}
+
+          {/* favorite */}
+          <button
+            onClick={() => handleEditFavorate(recipe._id)}
+            type="button"
+            aria-label="favorite"
+            aria-pressed={recipe.favorate}
+            className={`absolute end-4 top-4 flex h-9 w-9 items-center justify-center rounded-full backdrop-blur transition-colors ${
+              recipe.favorate
+                ? "bg-white text-red-500 hover:bg-red-500 hover:text-white"
+                : "bg-white/60 text-stone-700 hover:bg-red-500 hover:text-white"
+            }`}
+          >
+            <Heart
+              size={16}
+              className={recipe.favorate ? "fill-red-500" : "fill-white"}
+            />
+          </button>
+
+          {/* rating + photos */}
+          <div className="absolute inset-x-4 bottom-3 flex items-end justify-between">
+            {recipe.rating ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-stone-950/55 px-2.5 py-1 text-[12px] font-semibold text-white backdrop-blur">
+                <Star size={12} className="fill-[#ffa71c] text-[#ffa71c]" />
+                {Number(recipe.rating).toFixed(1)}
+              </span>
+            ) : (
+              <span />
+            )}
+            {recipe.images?.length > 0 && (
+              <span>
+                <Images size={12} />+{recipe.images.length}
+              </span>
+            )}
           </div>
         </div>
 
-        <div className="p-4">
+        {/* ───── Body ───── */}
+        <div className="flex flex-1 flex-col p-5">
           <h3
-            className="text-[16px] text-stone-900 mb-2 truncate"
+            className="truncate text-[19px] leading-tight text-stone-900"
             style={{ fontFamily: "'Fraunces', serif" }}
           >
             {recipe.title}
           </h3>
+          <p className="mt-1.5 line-clamp-2 min-h-[2.6rem] text-[13px] leading-[1.35rem] text-stone-500">
+            {recipe.description}
+          </p>
 
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-stone-500">
-            <span className="inline-flex items-center gap-1">
-              <Clock size={12} /> {recipe.time}
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <Gauge size={12} /> {recipe.difficulty}
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <Star size={12} className="text-[#ffa71c] fill-[#ffa71c]" />
-              {recipe.rating}
-            </span>
+          {/* meta strip */}
+          <div className="mt-4 grid grid-cols-3 divide-x divide-stone-200 rounded-2xl border border-stone-200 bg-white py-2.5 rtl:divide-x-reverse">
+            <div className="flex flex-col items-center gap-0.5">
+              <Clock size={14} className="text-stone-400" />
+              <span className="text-[12px] font-semibold text-stone-800">
+                {recipe.time} min
+              </span>
+            </div>
+            <div className="flex flex-col items-center gap-0.5">
+              <div className="flex h-[14px] items-end gap-[3px]">
+                {[1, 2, 3].map((i) => (
+                  <span
+                    key={i}
+                    style={{ height: 5 + i * 3 }}
+                    className={`w-[4px] rounded-sm ${i <= level ? LEVEL_COLOR[level] : "bg-stone-200"}`}
+                  />
+                ))}
+              </div>
+              <span className="text-[12px] font-semibold capitalize text-stone-800">
+                {recipe.difficulty}
+              </span>
+            </div>
+            <div className="flex flex-col items-center gap-0.5">
+              <ListChecks size={14} className="text-stone-400" />
+              <span className="text-[12px] font-semibold text-stone-800">
+                {recipe.ingredient} items
+              </span>
+            </div>
           </div>
-          <div className="mt-auto pt-4">
+
+          {/* CTA */}
+          <div className="mt-auto pt-5">
             <Link
               href={`/recipedetails/${recipe._id}`}
-              className="inline-flex items-center gap-2 rounded-full bg-stone-900 px-4 py-1.5 text-[12.5px] font-semibold text-white transition-colors hover:bg-black"
+              className="group/cta flex items-center justify-between rounded-full bg-stone-900 py-1.5 ps-5 pe-1.5 text-[13px] font-semibold text-white transition-colors hover:bg-black"
             >
               {t("recipes.seeCompleteRecipe")}
-              <ArrowUpRight size={14} />
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#ffa71c] text-stone-900 transition-transform group-hover/cta:rotate-45">
+                <ArrowUpRight size={16} />
+              </span>
             </Link>
           </div>
         </div>
-      </div>
+      </article>
     );
   });
 
@@ -302,7 +312,7 @@ export default function RecipesPage() {
             />
             <input
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => setParam("search", e.target.value)}
               placeholder={t("recipes.searchPlaceholder")}
               className="w-full rounded-full bg-white border border-stone-200 focus:border-[#ffa71c]/50 pl-10 pr-4 py-2.5 text-[13px] outline-none transition-colors placeholder:text-stone-400"
             />
@@ -314,13 +324,13 @@ export default function RecipesPage() {
           <div className=" flex flex-wrap gap-2.5 mb-10">
             <button
               className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-[13px] font-medium whitespace-nowrap border transition-colors ${
-                active === ""
+                activeCategory == ""
                   ? "bg-stone-900 text-white border-stone-900"
                   : "bg-white text-stone-500 border-stone-200 hover:border-[#ffa71c]/50 hover:text-stone-800"
               }`}
               onClick={() => {
                 setActive("");
-                setActiveCategory("");
+                setParam("category", "");
               }}
             >
               <ChefHat size={14} />

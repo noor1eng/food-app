@@ -13,6 +13,8 @@ import {
   Zap,
   ArrowUpRight,
   Plus,
+  Clock,
+  ListChecks,
 } from "lucide-react";
 import Navbar from "../../Navbar";
 import Link from "next/link";
@@ -95,6 +97,10 @@ export default function Hero() {
   const { language, changeLanguage } = useI18n();
   console.log(language);
 
+  // / easy / medium / hard  ->  1 / 2 / 3
+  const LEVELS = { easy: 1, سهل: 1, medium: 2, متوسط: 2, hard: 3, صعب: 3 };
+  const LEVEL_COLOR = ["", "bg-emerald-500", "bg-amber-500", "bg-rose-500"];
+
   useEffect(() => {
     setLoad(true);
     async function fetchRecipes() {
@@ -106,62 +112,106 @@ export default function Hero() {
     fetchRecipes();
   }, []);
 
-  const showRecipes = recipes?.map((recipe) => {
+  const showRecipes = recipes.map((recipe) => {
+    const level = LEVELS[String(recipe.difficulty).trim().toLowerCase()] ?? 2;
+    const categoryName = recipe.category?.name;
     return (
-      <div
+      <article
         key={recipe._id}
-        className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-stone-200 bg-white shadow-[0_18px_45px_-24px_rgba(15,23,42,0.45)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_25px_60px_-22px_rgba(15,23,42,0.55)]"
+        className="group relative flex flex-col overflow-hidden rounded-[28px] border border-stone-200/80 bg-[#FCFAF6] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_40px_-24px_rgba(60,40,10,0.35)]"
       >
-        <div className="relative overflow-hidden">
-          <div className="relative aspect-[4/3]">
-            <Image
-              src={`http://localhost:5000/images/${encodeURIComponent(recipe.coverImage)}`}
-              alt={recipe.title}
-              fill
-              unoptimized
-              className="object-cover transition duration-500 group-hover:scale-105"
-              loading="eager"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/5 to-transparent" />
-            <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-stone-700 backdrop-blur">
-              <ChefHat size={11} className="text-[#ffa71c]" />
-              {recipe.categroy}
+        {/* ───── Cover ───── */}
+        <div className="relative aspect-[4/3] overflow-hidden">
+          <Image
+            src={`http://localhost:5000/images/${encodeURIComponent(recipe.coverImage)}`}
+            alt={recipe.title}
+            fill
+            unoptimized
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-950/60 via-transparent to-stone-950/10" />
+
+          {/* category */}
+          {categoryName && (
+            <span className="absolute start-4 top-4 rounded-full bg-[#FCFAF6]/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-800 backdrop-blur">
+              {categoryName}
             </span>
+          )}
+
+          {/* rating + photos */}
+          <div className="absolute inset-x-4 bottom-3 flex items-end justify-between">
+            {recipe.rating ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-stone-950/55 px-2.5 py-1 text-[12px] font-semibold text-white backdrop-blur">
+                <Star size={12} className="fill-[#ffa71c] text-[#ffa71c]" />
+                {Number(recipe.rating).toFixed(1)}
+              </span>
+            ) : (
+              <span />
+            )}
+            {recipe.images?.length > 0 && (
+              <span>
+                <Image size={12} />+{recipe.images.length}
+              </span>
+            )}
           </div>
         </div>
 
+        {/* ───── Body ───── */}
         <div className="flex flex-1 flex-col p-5">
-          <div className="mb-3 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[11px] font-semibold text-stone-500">
-              <Eye size={13} className="text-[#ffa71c]" />
-              {recipe.rating ? `${recipe.rating}` : "Fresh recipe"}
-            </div>
-            <span className="rounded-full bg-[#fff3df] px-2.5 py-1 text-[10px] font-semibold text-[#a95f00]">
-              {recipe.time || "Quick"}
-            </span>
-          </div>
-
           <h3
-            className="text-[20px] leading-snug text-stone-900 mb-2"
-            style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 700 }}
+            className="truncate text-[19px] leading-tight text-stone-900"
+            style={{ fontFamily: "'Fraunces', serif" }}
           >
             {recipe.title}
           </h3>
-          <p className="text-[13px] leading-relaxed text-stone-600">
-            {recipe.descirption}
+          <p className="mt-1.5 line-clamp-2 min-h-[2.6rem] text-[13px] leading-[1.35rem] text-stone-500">
+            {recipe.description}
           </p>
 
-          <div className="mt-auto pt-4">
+          {/* meta strip */}
+          <div className="mt-4 grid grid-cols-3 divide-x divide-stone-200 rounded-2xl border border-stone-200 bg-white py-2.5 rtl:divide-x-reverse">
+            <div className="flex flex-col items-center gap-0.5">
+              <Clock size={14} className="text-stone-400" />
+              <span className="text-[12px] font-semibold text-stone-800">
+                {recipe.time} min
+              </span>
+            </div>
+            <div className="flex flex-col items-center gap-0.5">
+              <div className="flex h-[14px] items-end gap-[3px]">
+                {[1, 2, 3].map((i) => (
+                  <span
+                    key={i}
+                    style={{ height: 5 + i * 3 }}
+                    className={`w-[4px] rounded-sm ${i <= level ? LEVEL_COLOR[level] : "bg-stone-200"}`}
+                  />
+                ))}
+              </div>
+              <span className="text-[12px] font-semibold capitalize text-stone-800">
+                {recipe.difficulty}
+              </span>
+            </div>
+            <div className="flex flex-col items-center gap-0.5">
+              <ListChecks size={14} className="text-stone-400" />
+              <span className="text-[12px] font-semibold text-stone-800">
+                {recipe.ingredient} items
+              </span>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="mt-auto pt-5">
             <Link
               href={`/recipedetails/${recipe._id}`}
-              className="inline-flex items-center gap-2 rounded-full bg-stone-900 px-4 py-2.5 text-[12.5px] font-semibold text-white transition-colors hover:bg-black"
+              className="group/cta flex items-center justify-between rounded-full bg-stone-900 py-1.5 ps-5 pe-1.5 text-[13px] font-semibold text-white transition-colors hover:bg-black"
             >
               {t("recipes.seeCompleteRecipe")}
-              <ArrowUpRight size={14} />
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#ffa71c] text-stone-900 transition-transform group-hover/cta:rotate-45">
+                <ArrowUpRight size={16} />
+              </span>
             </Link>
           </div>
         </div>
-      </div>
+      </article>
     );
   });
 

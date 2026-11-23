@@ -216,7 +216,11 @@ export default function Sidebar() {
                 </p>
               </div>
               <button
-                // onClick={handleLogout}
+                onClick={() => {
+                  setToken(null);
+                  localStorage.removeItem("token");
+                  router.replace("/login");
+                }}
                 className="text-stone-300 hover:text-red-500 transition-colors shrink-0"
                 title={t("dashboard.sidebar.logout")}
               >

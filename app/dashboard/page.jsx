@@ -1,29 +1,14 @@
 "use client";
-import React, { useState, useEffect } from "react";
 import {
-  LayoutGrid,
   BookOpen,
-  PlusCircle,
-  Heart,
-  FolderHeart,
-  UserCircle2,
-  Settings,
   Eye,
   Star,
   Users,
   TrendingUp,
   TrendingDown,
-  ArrowUpRight,
-  Clock,
   MoreHorizontal,
 } from "lucide-react";
 import { t } from "@/app/il8n";
-
-/* ---------------------------------------------------------
-   FLAVORIZ — Dashboard Layout
-   Light editorial system: cream canvas, white floating panels,
-   Outfit display font, black active states, orange accent.
---------------------------------------------------------- */
 
 const STATS = [
   {

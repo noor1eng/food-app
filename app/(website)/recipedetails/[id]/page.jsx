@@ -2,15 +2,15 @@
 import React, { useState, useEffect, useMemo } from "react";
 import {
   Clock,
-  Gauge,
   Star,
-  Eye,
   Heart,
-  Share2,
   ChefHat,
   MessageCircle,
   Send,
   ThumbsUp,
+  Images,
+  ListChecks,
+  Check,
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import axios from "axios";
@@ -18,41 +18,36 @@ import Image from "next/image";
 import { t, useI18n } from "@/app/il8n";
 import { toast } from "@/components/ui/toast";
 
-// const RECIPE = {
-//   title: "Creamy Chicken Pasta",
-//   description:
-//     "A rich and comforting pasta dish featuring tender grilled chicken tossed in a silky parmesan cream sauce. Ready in under 30 minutes, it's the kind of weeknight dinner that feels like a treat — simple ingredients, big flavor.",
-//   category: "Pasta",
-//   time: "20 min",
-//   difficulty: "Easy",
-//   rating: 4.8,
-//   ratingCount: 245,
-//   views: 1240,
-//   coverImage:
-//     "https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?q=80&w=1200&auto=format&fit=crop",
-//   author: {
-//     name: "Noor Al-Amin",
-//     avatar: "https://i.pravatar.cc/64?img=13",
-//   },
-//   ingredients: [
-//     "200g pasta",
-//     "2 chicken breasts, sliced",
-//     "1 cup heavy cream",
-//     "1/2 cup parmesan cheese, grated",
-//     "2 cloves garlic, minced",
-//     "1 tbsp olive oil",
-//     "Salt & black pepper to taste",
-//     "Fresh parsley, chopped",
-//   ],
-//   instructions: [
-//     "Cook the pasta according to package instructions. Drain and set aside.",
-//     "Season chicken slices with salt and pepper. Grill until golden and cooked through, then set aside.",
-//     "In the same pan, sauté garlic in olive oil until fragrant.",
-//     "Pour in the heavy cream and bring to a gentle simmer. Stir in the parmesan until melted and smooth.",
-//     "Add the pasta and chicken back into the pan, tossing to coat evenly in the sauce.",
-//     "Garnish with fresh parsley and extra parmesan before serving.",
-//   ],
-// };
+/* ───────── helpers (مبنية على الـ schema) ───────── */
+const LEVELS = { easy: 1, سهل: 1, medium: 2, متوسط: 2, hard: 3, صعب: 3 };
+const LEVEL_COLOR = ["", "bg-emerald-500", "bg-amber-500", "bg-rose-500"];
+const IMG = (name) =>
+  `http://localhost:5000/images/${encodeURIComponent(name)}`;
+
+const formatTime = (m) => {
+  const n = Number(m) || 0;
+  if (n < 60) return `${n} min`;
+  const h = Math.floor(n / 60);
+  const r = n % 60;
+  return r ? `${h}h ${r}m` : `${h}h`;
+};
+
+// نص -> مصفوفة (سطر جديد أو فاصلة عادية أو عربية)
+const toIngredients = (s) =>
+  String(s || "")
+    .split(/[\n,،]+/)
+    .map((x) => x.trim())
+    .filter(Boolean);
+
+// يحذف الترقيم القديم ("1." أو "-") ويقسم على الأسطر، وإذا فقرة وحدة يقسمها على الجمل
+const toSteps = (s) => {
+  const lines = String(s || "")
+    .split(/\n+/)
+    .map((x) => x.replace(/^\s*(\d+[.)\-]|[-•*])\s*/, "").trim())
+    .filter(Boolean);
+  if (lines.length > 1) return lines;
+  return (lines[0] || "").split(/(?<=[.!?؟])\s+/).filter(Boolean);
+};
 
 const INITIAL_COMMENTS = [
   {
@@ -96,7 +91,7 @@ function StarRating({ value, onChange, size = 18, interactive = false }) {
             <Star
               size={size}
               className={
-                filled ? "text-[#ffa71c] fill-[#ffa71c]" : "text-stone-300"
+                filled ? "fill-[#ffa71c] text-[#ffa71c]" : "text-stone-300"
               }
             />
           </button>
@@ -106,64 +101,90 @@ function StarRating({ value, onChange, size = 18, interactive = false }) {
   );
 }
 
+function Skeleton() {
+  return (
+    <div className="mx-auto max-w-6xl animate-pulse px-5 py-10 sm:px-8">
+      <div className="aspect-[21/9] w-full rounded-[32px] bg-stone-200" />
+      <div className="mx-10 -mt-8 h-20 rounded-2xl bg-stone-100" />
+      <div className="mt-10 h-40 rounded-2xl bg-stone-200/60" />
+    </div>
+  );
+}
+
 export default function RecipeDetailsPage() {
   const [comments, setComments] = useState(INITIAL_COMMENTS);
   const [commentText, setCommentText] = useState("");
   const [userRating, setUserRating] = useState(0);
-  const [recipe, setRecipe] = useState([]);
+  const [recipe, setRecipe] = useState(null);
+  const [error, setError] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [checked, setChecked] = useState({});
   const { language } = useI18n();
-  const id = useParams().id; // Assuming you have a way to get the recipe ID from the URL
+  const id = useParams().id;
 
   useEffect(() => {
-    try {
-      async function fetchRecipeDetails() {
-        await axios
-          .get(`http://localhost:5000/api/v1/recipe/${id}`)
-          .then((response) => {
-            setRecipe(response.data);
-          });
-      }
-      fetchRecipeDetails();
-    } catch (error) {
-      console.error("Error fetching recipe details:", error);
-    }
+    let alive = true;
+    axios
+      .get(`http://localhost:5000/api/v1/recipe/${id}`)
+      .then((res) => {
+        if (!alive) return;
+        setRecipe(res.data);
+        setSaved(!!res.data.favorate);
+      })
+      .catch((err) => {
+        console.error("Error fetching recipe details:", err);
+        if (alive) setError(true);
+      });
+    return () => {
+      alive = false;
+    };
   }, [id]);
 
+  const ingredients = useMemo(
+    () => toIngredients(recipe?.ingrediaint),
+    [recipe],
+  );
+  const steps = useMemo(() => toSteps(recipe?.instructions), [recipe]);
+  const doneCount = ingredients.filter((_, i) => checked[i]).length;
+
+  // تقييم الوصفة نفسها من الـ schema، وإذا ما في تقييم نعرض متوسط التعليقات
   const avgRating = useMemo(() => {
-    if (comments.length === 0) return recipe.rating;
-    const sum = comments.reduce((acc, c) => acc + c.rating, 0);
-    return (sum / comments.length).toFixed(1);
-  }, [comments]);
+    if (recipe?.rating) return Number(recipe.rating);
+    if (!comments.length) return 0;
+    return comments.reduce((a, c) => a + c.rating, 0) / comments.length;
+  }, [recipe, comments]);
 
   const handleSubmitComment = (e) => {
     e.preventDefault();
     if (!commentText.trim() || userRating === 0) return;
-    const newComment = {
-      id: Date.now(),
-      name: "You",
-      avatar: "https://i.pravatar.cc/64?img=68",
-      rating: userRating,
-      date: "Just now",
-      text: commentText.trim(),
-      likes: 0,
-    };
-    setComments([newComment, ...comments]);
+    setComments([
+      {
+        id: Date.now(),
+        name: "You",
+        avatar: "https://i.pravatar.cc/64?img=68",
+        rating: userRating,
+        date: "Just now",
+        text: commentText.trim(),
+        likes: 0,
+      },
+      ...comments,
+    ]);
     setCommentText("");
     setUserRating(0);
   };
 
-  async function handleEditFavorate(id) {
+  async function handleEditFavorate(recipeId) {
     try {
-      await axios
-        .put(`http://localhost:5000/api/v1/recipe/${id}/favorate`)
-        .then((res) => {
-          console.log(res.data);
-          setSaved((prev) => !prev);
-        });
+      await axios.put(
+        `http://localhost:5000/api/v1/recipe/${recipeId}/favorate`,
+      );
+      const next = !saved;
+      setSaved(next);
       toast.add({
-        title: "added to favorate",
-        description: "Your recipe has been added to favorte",
+        title: next ? "added to favorate" : "removed from favorate",
+        description: next
+          ? "Your recipe has been added to favorite"
+          : "Your recipe has been removed from favorite",
         type: "success",
         timeout: 2000,
       });
@@ -172,132 +193,230 @@ export default function RecipeDetailsPage() {
     }
   }
 
+  if (error)
+    return (
+      <div className="py-32 text-center text-stone-500">Recipe not found.</div>
+    );
+  if (!recipe) return <Skeleton />;
+
+  const level = LEVELS[String(recipe.difficulty).trim().toLowerCase()] ?? 2;
+  const gallery = recipe.images || [];
+
   return (
     <div
-      className="w-full bg-[#f7f7f7] text-stone-900"
+      className="w-full bg-[#F6F2EA] text-stone-900"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
-      <main className="max-w-6xl mx-auto px-5 sm:px-8 py-8 sm:py-10">
-        {/* Cover + title */}
-        <div className="relative rounded-3xl overflow-hidden mb-8">
-          <div className="aspect-[16/9] sm:aspect-[21/9] w-full">
+      <style>{`@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}.fu{animation:fadeUp .6s cubic-bezier(.2,.7,.2,1) both}`}</style>
+
+      <main className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-10">
+        {/* ───── Hero ───── */}
+        <section className="fu relative">
+          <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[32px] sm:aspect-[21/9]">
             <Image
-              src={`http://localhost:5000/images/${encodeURIComponent(recipe.coverImage)}`}
+              src={IMG(recipe.coverImage)}
               alt={recipe.title || ""}
               fill
               unoptimized
-              className="h-full w-full object-cover"
-              loading="eager"
+              priority
+              className="object-cover"
             />
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-stone-950/10 to-stone-950/20" />
 
-          <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-stone-800 bg-white/90 backdrop-blur px-3 py-1.5 rounded-full">
-              {recipe.category}
-            </span>
-            <div className="flex items-center gap-2">
+            <div className="absolute inset-x-5 top-5 flex items-center justify-between sm:inset-x-8 sm:top-7">
+              {recipe.category?.name ? (
+                <span className="rounded-full bg-[#FCFAF6]/90 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-800 backdrop-blur">
+                  {recipe.category.name}
+                </span>
+              ) : (
+                <span />
+              )}
               <button
+                type="button"
+                aria-pressed={saved}
+                aria-label="favorite"
                 onClick={() => handleEditFavorate(recipe._id)}
-                className={`w-9 h-9 rounded-full flex items-center justify-center backdrop-blur transition-colors ${
+                className={`flex h-10 w-10 items-center justify-center rounded-full backdrop-blur transition-colors ${
                   saved
                     ? "bg-red-500 text-white"
-                    : "bg-white/90 text-stone-700 hover:bg-white"
+                    : "bg-white/70 text-stone-700 hover:bg-red-500 hover:text-white"
                 }`}
               >
-                <Heart size={16} className={saved ? "fill-white" : ""} />
+                <Heart size={17} className={saved ? "fill-white" : ""} />
               </button>
             </div>
-          </div>
 
-          <div className="absolute bottom-5 left-5 right-5 sm:bottom-7 sm:left-8 sm:right-8">
-            <h1
-              className="text-[26px] sm:text-[38px] leading-tight text-white max-w-2xl"
-              style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 700 }}
-            >
-              {recipe.title}
-            </h1>
-          </div>
-        </div>
-
-        {/* Meta row */}
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mb-8 pb-6 border-b border-stone-200">
-          <div className="hidden sm:block w-px h-8 bg-stone-200" />
-
-          <span className="inline-flex items-center gap-1.5 text-[13px] text-stone-600">
-            <Clock size={15} className="text-stone-400" /> {recipe.time}
-          </span>
-          <span className="inline-flex items-center gap-1.5 text-[13px] text-stone-600">
-            <Gauge size={15} className="text-stone-400" /> {recipe.difficulty}
-          </span>
-          <span className="inline-flex items-center gap-1.5 text-[13px] text-stone-600">
-            <Eye size={15} className="text-stone-400" />{" "}
-            {t("recipeDetails.views")}
-          </span>
-          <span className="inline-flex items-center gap-1.5 text-[13px] text-stone-600">
-            <StarRating value={Number(avgRating)} size={14} />
-            <span className="font-semibold text-stone-800">{avgRating}</span>
-            <span className="text-stone-400">
-              ({t("recipeDetails.reviewsCount", { count: comments.length })})
-            </span>
-          </span>
-        </div>
-
-        {/* Content grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-14">
-          {/* Left: description + instructions */}
-          <div className="lg:col-span-2 space-y-8">
-            <div>
-              <h2
-                className="text-[19px] text-stone-900 mb-3"
-                style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 700 }}
+            <div className="absolute inset-x-5 bottom-14 sm:inset-x-10 sm:bottom-16">
+              <h1
+                className="max-w-3xl text-[30px] leading-[1.05] text-white sm:text-[52px]"
+                style={{ fontFamily: "'Fraunces', serif", fontWeight: 500 }}
               >
-                {t("recipeDetails.about")}
-              </h2>
-              <p className="text-[14.5px] text-stone-600 leading-relaxed">
+                {recipe.title}
+              </h1>
+            </div>
+          </div>
+
+          {/* stat strip */}
+          <div
+            className="fu relative z-10 mx-3 -mt-8 grid grid-cols-2 divide-stone-200 rounded-3xl border border-stone-200 bg-white py-4 shadow-[0_20px_40px_-24px_rgba(60,40,10,0.35)] sm:mx-10 sm:grid-cols-4 sm:divide-x rtl:sm:divide-x-reverse"
+            style={{ animationDelay: ".12s" }}
+          >
+            <Stat
+              label="Time"
+              icon={<Clock size={16} className="text-[#ffa71c]" />}
+            >
+              {formatTime(recipe.time)}
+            </Stat>
+            <Stat
+              label="Difficulty"
+              icon={
+                <div className="flex h-4 items-end gap-[3px]">
+                  {[1, 2, 3].map((i) => (
+                    <span
+                      key={i}
+                      style={{ height: 6 + i * 3 }}
+                      className={`w-[4px] rounded-sm ${i <= level ? LEVEL_COLOR[level] : "bg-stone-200"}`}
+                    />
+                  ))}
+                </div>
+              }
+            >
+              <span className="capitalize">{recipe.difficulty}</span>
+            </Stat>
+            <Stat
+              label="Ingredients"
+              icon={<ListChecks size={16} className="text-[#ffa71c]" />}
+            >
+              {ingredients.length} items
+            </Stat>
+            <Stat
+              label="Rating"
+              icon={
+                <Star size={16} className="fill-[#ffa71c] text-[#ffa71c]" />
+              }
+            >
+              {avgRating ? avgRating.toFixed(1) : "—"}
+              <span className="ms-1 text-[12px] font-medium text-stone-400">
+                ({comments.length})
+              </span>
+            </Stat>
+          </div>
+        </section>
+
+        {/* ───── Content ───── */}
+        <div className="mb-16 mt-12 grid grid-cols-1 gap-10 lg:grid-cols-3">
+          <div className="space-y-12 lg:col-span-2">
+            <section className="fu" style={{ animationDelay: ".2s" }}>
+              <SectionTitle>{t("recipeDetails.about")}</SectionTitle>
+              <p className="text-[15.5px] leading-[1.8] text-stone-600 first-letter:float-start first-letter:me-2 first-letter:text-[52px] first-letter:leading-[0.9] first-letter:text-stone-900">
                 {recipe.description}
               </p>
-            </div>
+            </section>
 
-            <div>
-              <h2
-                className="text-[19px] text-stone-900 mb-4"
-                style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 700 }}
-              >
-                {t("recipeDetails.instructions")}
-              </h2>
-              <ol className="space-y-4">
-                <li className="flex gap-4">
-                  <span className="shrink-0 w-8 h-8 rounded-full bg-stone-900 text-white text-[13px] font-bold flex items-center justify-center"></span>
-                  <p className="text-[14px] text-stone-600 leading-relaxed pt-1">
-                    {recipe.instructions}
-                  </p>
-                </li>
+            {gallery.length > 0 && (
+              <section className="fu" style={{ animationDelay: ".26s" }}>
+                <SectionTitle
+                  icon={<Images size={18} className="text-stone-400" />}
+                >
+                  Gallery
+                </SectionTitle>
+                <div
+                  className={`grid gap-3 ${gallery.length === 1 ? "grid-cols-1" : gallery.length % 3 === 0 ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2"}`}
+                >
+                  {gallery.map((img, i) => (
+                    <div
+                      key={i}
+                      className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-stone-200"
+                    >
+                      <Image
+                        src={IMG(img)}
+                        alt={`${recipe.title} ${i + 1}`}
+                        fill
+                        unoptimized
+                        className="object-cover transition-transform duration-700 hover:scale-105"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            <section className="fu" style={{ animationDelay: ".32s" }}>
+              <SectionTitle>{t("recipeDetails.instructions")}</SectionTitle>
+              <ol className="relative space-y-7">
+                <span className="absolute bottom-3 start-[19px] top-3 w-px bg-stone-300/70" />
+                {steps.map((step, i) => (
+                  <li key={i} className="relative flex gap-5">
+                    <span
+                      className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-stone-900 text-[17px] text-white ring-4 ring-[#F6F2EA]"
+                      style={{ fontFamily: "'Fraunces', serif" }}
+                    >
+                      {i + 1}
+                    </span>
+                    <p className="pt-1.5 text-[15px] leading-[1.75] text-stone-700">
+                      {step}
+                    </p>
+                  </li>
+                ))}
               </ol>
-            </div>
+            </section>
           </div>
 
-          {/* Right: ingredients */}
-          <div className="space-y-5">
-            <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 lg:sticky lg:top-24">
-              <h3
-                className="text-[16px] text-stone-900 mb-4"
-                style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 700 }}
-              >
-                {t("recipeDetails.ingredients")}
-              </h3>
-              <ul className="space-y-2.5">
-                <li className="flex items-start gap-2.5">
-                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#ffa71c] shrink-0" />
-                  <span className="text-[13.5px] text-stone-600">
-                    {recipe.ingredients}
-                  </span>
-                </li>
+          {/* ───── Ingredients ───── */}
+          <aside className="fu" style={{ animationDelay: ".24s" }}>
+            <div className="rounded-3xl border border-stone-200 bg-white p-6 lg:sticky lg:top-24">
+              <div className="mb-1 flex items-baseline justify-between">
+                <h3
+                  className="text-[22px] text-stone-900"
+                  style={{ fontFamily: "'Fraunces', serif", fontWeight: 500 }}
+                >
+                  {t("recipeDetails.ingredients")}
+                </h3>
+                <span className="text-[12px] font-semibold text-stone-400">
+                  {doneCount}/{ingredients.length}
+                </span>
+              </div>
+              <div className="mb-5 h-1 overflow-hidden rounded-full bg-stone-100">
+                <div
+                  className="h-full rounded-full bg-[#ffa71c] transition-all duration-300"
+                  style={{
+                    width: `${ingredients.length ? (doneCount / ingredients.length) * 100 : 0}%`,
+                  }}
+                />
+              </div>
+
+              <ul className="space-y-1">
+                {ingredients.map((item, i) => (
+                  <li key={i}>
+                    <button
+                      type="button"
+                      onClick={() => setChecked((p) => ({ ...p, [i]: !p[i] }))}
+                      className="flex w-full items-start gap-3 rounded-xl px-2 py-2 text-start transition-colors hover:bg-stone-50"
+                    >
+                      <span
+                        className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors ${checked[i] ? "border-[#ffa71c] bg-[#ffa71c]" : "border-stone-300 bg-white"}`}
+                      >
+                        {checked[i] && (
+                          <Check
+                            size={13}
+                            className="text-stone-900"
+                            strokeWidth={3}
+                          />
+                        )}
+                      </span>
+                      <span
+                        className={`text-[14px] leading-snug transition-colors ${checked[i] ? "text-stone-400 line-through" : "text-stone-700"}`}
+                      >
+                        {item}
+                      </span>
+                    </button>
+                  </li>
+                ))}
               </ul>
 
-              <div className="mt-6 pt-5 border-t border-stone-100 flex items-center justify-between">
+              <div className="mt-6 flex items-center justify-between border-t border-stone-100 pt-5">
                 <div>
-                  <p className="text-[11px] text-stone-400">
+                  <p className="mb-1 text-[11px] text-stone-400">
                     {t("recipeDetails.rateRecipe")}
                   </p>
                   <StarRating
@@ -307,19 +426,19 @@ export default function RecipeDetailsPage() {
                     size={18}
                   />
                 </div>
-                <ChefHat size={20} className="text-[#ffa71c]" />
+                <ChefHat size={22} className="text-[#ffa71c]" />
               </div>
             </div>
-          </div>
+          </aside>
         </div>
 
-        {/* Comments */}
-        <div>
-          <div className="flex items-center gap-2 mb-6">
+        {/* ───── Reviews ───── */}
+        <section>
+          <div className="mb-6 flex items-center gap-2">
             <MessageCircle size={18} className="text-stone-700" />
             <h2
-              className="text-[20px] text-stone-900"
-              style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 700 }}
+              className="text-[26px] text-stone-900"
+              style={{ fontFamily: "'Fraunces', serif", fontWeight: 500 }}
             >
               {t("recipeDetails.reviews")}
             </h2>
@@ -328,12 +447,11 @@ export default function RecipeDetailsPage() {
             </span>
           </div>
 
-          {/* New comment form */}
           <form
             onSubmit={handleSubmitComment}
-            className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 mb-8"
+            className="mb-8 rounded-3xl border border-stone-200 bg-white p-5 sm:p-6"
           >
-            <div className="flex items-center justify-between mb-3">
+            <div className="mb-3 flex items-center justify-between">
               <label className="text-[13px] font-semibold text-stone-700">
                 {t("recipeDetails.yourRating")}
               </label>
@@ -349,60 +467,81 @@ export default function RecipeDetailsPage() {
               onChange={(e) => setCommentText(e.target.value)}
               placeholder={t("recipeDetails.shareThoughts")}
               rows={3}
-              className="w-full rounded-xl border border-stone-200 bg-stone-50/60 px-3.5 py-2.5 text-[13.5px] text-stone-800 placeholder:text-stone-400 outline-none transition-all focus:bg-white focus:border-[#ffa71c] focus:ring-4 focus:ring-[#ffa71c]/10 resize-none"
+              className="w-full resize-none rounded-xl border border-stone-200 bg-stone-50/60 px-3.5 py-2.5 text-[13.5px] text-stone-800 outline-none transition-all placeholder:text-stone-400 focus:border-[#ffa71c] focus:bg-white focus:ring-4 focus:ring-[#ffa71c]/10"
             />
-            <div className="flex justify-end mt-3">
+            <div className="mt-3 flex justify-end">
               <button
                 type="submit"
                 disabled={!commentText.trim() || userRating === 0}
-                className="inline-flex items-center gap-1.5 bg-[#ffa71c] text-stone-900 text-[13px] font-semibold px-5 py-2.5 rounded-full hover:bg-[#ff9c00] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-1.5 rounded-full bg-stone-900 px-5 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-black disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {t("recipeDetails.postComment")} <Send size={13} />
               </button>
             </div>
           </form>
 
-          {/* Comment list */}
-          <div className="space-y-5">
+          <div className="space-y-4">
             {comments.map((c) => (
               <div
                 key={c.id}
-                className="bg-white rounded-2xl border border-stone-200 p-5"
+                className="rounded-3xl border border-stone-200 bg-white p-5"
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={c.avatar}
-                      className="w-10 h-10 rounded-full object-cover"
-                      alt={c.name}
-                    />
-                    <div>
-                      <p className="text-[13.5px] font-semibold text-stone-800">
-                        {c.name}
-                      </p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <StarRating value={c.rating} size={12} />
-                        <span className="text-[11px] text-stone-400">
-                          {c.date}
-                        </span>
-                      </div>
+                <div className="flex items-center gap-3">
+                  <img
+                    src={c.avatar}
+                    className="h-10 w-10 rounded-full object-cover"
+                    alt={c.name}
+                  />
+                  <div>
+                    <p className="text-[13.5px] font-semibold text-stone-800">
+                      {c.name}
+                    </p>
+                    <div className="mt-0.5 flex items-center gap-2">
+                      <StarRating value={c.rating} size={12} />
+                      <span className="text-[11px] text-stone-400">
+                        {c.date}
+                      </span>
                     </div>
                   </div>
                 </div>
-
-                <p className="text-[13.5px] text-stone-600 leading-relaxed mt-3.5">
+                <p className="mt-3.5 text-[13.5px] leading-relaxed text-stone-600">
                   {c.text}
                 </p>
-
-                <button className="inline-flex items-center gap-1.5 text-[12px] text-stone-400 hover:text-[#a95f00] transition-colors mt-3.5">
+                <button className="mt-3.5 inline-flex items-center gap-1.5 text-[12px] text-stone-400 transition-colors hover:text-[#a95f00]">
                   <ThumbsUp size={13} /> {t("recipeDetails.helpful")} ({c.likes}
                   )
                 </button>
               </div>
             ))}
           </div>
-        </div>
+        </section>
       </main>
     </div>
+  );
+}
+
+function Stat({ label, icon, children }) {
+  return (
+    <div className="flex flex-col items-center gap-1 px-2 py-2">
+      <span className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-stone-400">
+        {label}
+      </span>
+      <div className="flex items-center gap-2 text-[16px] font-semibold text-stone-900">
+        {icon}
+        <span>{children}</span>
+      </div>
+    </div>
+  );
+}
+
+function SectionTitle({ children, icon }) {
+  return (
+    <h2
+      className="mb-4 flex items-center gap-2 text-[26px] text-stone-900"
+      style={{ fontFamily: "'Fraunces', serif", fontWeight: 500 }}
+    >
+      {children}
+      {icon}
+    </h2>
   );
 }

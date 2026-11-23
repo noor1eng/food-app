@@ -1,135 +1,171 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import {
-  LayoutGrid,
-  BookOpen,
-  PlusCircle,
   Heart,
-  FolderHeart,
-  UserCircle2,
-  Settings,
+  HeartOff,
   Star,
   Clock,
-  Gauge,
-  HeartOff,
   ChefHat,
+  ArrowUpRight,
 } from "lucide-react";
-import { t, useI18n } from "@/app/il8n";
+import { t } from "@/app/il8n";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
-import { de, fa, id } from "zod/locales";
 import { SkeletonCard } from "@/app/skeleton/SkeletonCard";
 import { toast } from "@/components/ui/toast";
 
-const NAV_ITEMS = [
-  { label: "Dashboard", icon: LayoutGrid },
-  { label: "My Recipes", icon: BookOpen },
-  { label: "Add Recipe", icon: PlusCircle },
-  { label: "Favorites", icon: Heart, active: true },
-  { label: "Collections", icon: FolderHeart },
-  { label: "Profile", icon: UserCircle2 },
-  { label: "Settings", icon: Settings },
-];
+/* ───────── helpers ───────── */
+const LEVELS = { easy: 1, سهل: 1, medium: 2, متوسط: 2, hard: 3, صعب: 3 };
+const LEVEL_COLOR = ["", "bg-emerald-500", "bg-amber-500", "bg-rose-500"];
 
-const INITIAL_FAVORITES = [
-  {
-    id: 1,
-    title: "Creamy Chicken Pasta",
-    category: "Pasta",
-    time: "20 min",
-    difficulty: "Easy",
-    rating: 4.8,
-    img: "https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?q=80&w=500&auto=format&fit=crop",
-  },
-  {
-    id: 2,
-    title: "Avocado Salad",
-    category: "Salad",
-    time: "15 min",
-    difficulty: "Easy",
-    rating: 4.9,
-    img: "https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=500&auto=format&fit=crop",
-  },
-  {
-    id: 3,
-    title: "Grilled Salmon",
-    category: "Seafood",
-    time: "25 min",
-    difficulty: "Medium",
-    rating: 4.9,
-    img: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?q=80&w=500&auto=format&fit=crop",
-  },
-  {
-    id: 4,
-    title: "Fluffy Pancakes",
-    category: "Breakfast",
-    time: "20 min",
-    difficulty: "Easy",
-    rating: 4.8,
-    img: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?q=80&w=500&auto=format&fit=crop",
-  },
-];
+const formatTime = (m) => {
+  const n = Number(m) || 0;
+  if (n < 60) return `${n} min`;
+  const h = Math.floor(n / 60);
+  const r = n % 60;
+  return r ? `${h}h ${r}m` : `${h}h`;
+};
 
+/* ───────── Empty state ───────── */
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center justify-center text-center py-20 sm:py-28">
-      <span className="inline-flex w-16 h-16 rounded-full bg-[#ffa71c]/12 items-center justify-center mb-5">
-        <HeartOff size={26} className="text-[#a95f00]" />
+    <div className="flex flex-col items-center justify-center rounded-[32px] border border-dashed border-stone-300 bg-[#FCFAF6] px-6 py-20 text-center sm:py-28">
+      <span className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-full bg-[#ffa71c]/15 ring-8 ring-[#ffa71c]/5">
+        <HeartOff size={30} className="text-[#a95f00]" />
       </span>
       <h3
-        className="text-[19px] text-stone-900 mb-2"
-        style={{ fontFamily: "'Fraunces', serif" }}
+        className="mb-2 text-[26px] text-stone-900"
+        style={{ fontFamily: "'Fraunces', serif", fontWeight: 500 }}
       >
         {t("favorites.emptyTitle")}
       </h3>
-      <p className="text-stone-500 text-[13.5px] max-w-xs mb-6">
+      <p className="mb-7 max-w-xs text-[14px] leading-relaxed text-stone-500">
         {t("favorites.emptyDescription")}
       </p>
-      <Link href={"/recipes"}>
-        <button className="inline-flex items-center gap-1.5 bg-[#ffa71c] text-stone-900 text-[13.5px] font-semibold px-5 py-2.5 rounded-xl hover:bg-[#ff9c00] shadow-[0_8px_20px_-8px_rgba(255,167,28,0.6)] transition-colors">
-          <ChefHat size={15} /> {t("favorites.browseRecipes")}
-        </button>
+      <Link
+        href="/recipes"
+        className="inline-flex items-center gap-2 rounded-full bg-stone-900 px-6 py-3 text-[13.5px] font-semibold text-white transition-colors hover:bg-black"
+      >
+        <ChefHat size={16} className="text-[#ffa71c]" />{" "}
+        {t("favorites.browseRecipes")}
       </Link>
     </div>
   );
 }
 
+/* ───────── Favorite card ───────── */
+function FavoriteCard({ recipe, removing, onRemove, index }) {
+  const level = LEVELS[String(recipe.difficulty).trim().toLowerCase()] ?? 2;
+
+  return (
+    <article
+      style={{ animationDelay: `${index * 70}ms` }}
+      className={`fav-in group relative flex flex-col overflow-hidden rounded-[28px] border border-stone-200/80 bg-[#FCFAF6] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_40px_-24px_rgba(60,40,10,0.35)] ${
+        removing ? "pointer-events-none scale-95 opacity-0" : ""
+      }`}
+    >
+      <div className="relative aspect-[4/3] overflow-hidden">
+        <Image
+          src={`http://localhost:5000/images/${encodeURIComponent(recipe.coverImage)}`}
+          alt={recipe.title}
+          fill
+          unoptimized
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-950/55 via-transparent to-stone-950/10" />
+
+        {recipe.category?.name && (
+          <span className="absolute start-4 top-4 rounded-full bg-[#FCFAF6]/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-800 backdrop-blur">
+            {recipe.category.name}
+          </span>
+        )}
+
+        <button
+          type="button"
+          onClick={() => onRemove(recipe._id)}
+          title={t("favorites.removeFromFavorites")}
+          aria-label={t("favorites.removeFromFavorites")}
+          className="absolute end-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-red-500 text-white backdrop-blur transition-all hover:scale-110 hover:bg-white hover:text-red-500"
+        >
+          <Heart size={15} className="fill-current" />
+        </button>
+
+        {recipe.rating ? (
+          <span className="absolute bottom-3 start-4 inline-flex items-center gap-1 rounded-full bg-stone-950/55 px-2.5 py-1 text-[12px] font-semibold text-white backdrop-blur">
+            <Star size={12} className="fill-[#ffa71c] text-[#ffa71c]" />
+            {Number(recipe.rating).toFixed(1)}
+          </span>
+        ) : null}
+      </div>
+
+      <div className="flex flex-1 flex-col p-5">
+        <h3
+          className="truncate text-[19px] leading-tight text-stone-900"
+          style={{ fontFamily: "'Fraunces', serif" }}
+        >
+          {recipe.title}
+        </h3>
+
+        <div className="mt-3 flex items-center gap-4 text-[12.5px] font-medium text-stone-600">
+          <span className="inline-flex items-center gap-1.5">
+            <Clock size={14} className="text-stone-400" />{" "}
+            {formatTime(recipe.time)}
+          </span>
+          <span className="inline-flex items-center gap-2">
+            <span className="flex h-[14px] items-end gap-[3px]">
+              {[1, 2, 3].map((i) => (
+                <span
+                  key={i}
+                  style={{ height: 5 + i * 3 }}
+                  className={`w-[4px] rounded-sm ${i <= level ? LEVEL_COLOR[level] : "bg-stone-200"}`}
+                />
+              ))}
+            </span>
+            <span className="capitalize">{recipe.difficulty}</span>
+          </span>
+        </div>
+
+        <Link
+          href={`/recipedetails/${recipe._id}`}
+          className="group/cta mt-5 flex items-center justify-between rounded-full bg-stone-900 py-1.5 ps-5 pe-1.5 text-[13px] font-semibold text-white transition-colors hover:bg-black"
+        >
+          {t("recipes.seeCompleteRecipe")}
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#ffa71c] text-stone-900 transition-transform group-hover/cta:rotate-45">
+            <ArrowUpRight size={16} />
+          </span>
+        </Link>
+      </div>
+    </article>
+  );
+}
+
+/* ───────── Page ───────── */
 export default function FavoritesPage() {
-  const [favorites, setFavorites] = useState(INITIAL_FAVORITES);
-  const [favorateRecipe, setFavorte] = useState([]);
-  const [load, setLoad] = useState(false);
-  const [render, setRender] = useState(false);
-  const { language } = useI18n();
+  const [favorites, setFavorites] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [removingId, setRemovingId] = useState(null);
 
   useEffect(() => {
-    setLoad(true);
-    async function fetchRecipe() {
-      try {
-        await axios
-          .get(`http://localhost:5000/api/v1/recipe/favorate`)
-          .then((res) => {
-            console.log(res.data);
-            setFavorte(res.data);
-          });
-        setLoad(false);
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setLoad(false);
-      }
-    }
-    fetchRecipe();
-  }, [render]);
+    let alive = true;
+    axios
+      .get("http://localhost:5000/api/v1/recipe/favorate")
+      .then((res) => alive && setFavorites(res.data))
+      .catch((err) => console.log(err))
+      .finally(() => alive && setLoading(false));
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const handleRemove = async (id) => {
+    setRemovingId(id); // يشغّل أنيميشن الاختفاء
     try {
-      await axios
-        .patch(`http://localhost:5000/api/v1/recipe/${id}/favorate`)
-        .then((res) => {
-          console.log(res.data);
-          setRender((prev) => !prev);
-        });
+      await axios.patch(`http://localhost:5000/api/v1/recipe/${id}/favorate`);
+      setTimeout(() => {
+        setFavorites((prev) => prev.filter((r) => r._id !== id));
+        setRemovingId(null);
+      }, 300);
       toast.add({
         title: "removed from favorate",
         description: "Your recipe has been removed",
@@ -138,103 +174,64 @@ export default function FavoritesPage() {
       });
     } catch (err) {
       console.log(err);
+      setRemovingId(null);
     }
   };
 
-  const showFavorate = favorateRecipe.map((favrecipe) => {
-    return (
-      <div
-        key={favrecipe._id}
-        className="group rounded-2xl border border-stone-200 bg-white overflow-hidden hover:shadow-[0_16px_32px_-16px_rgba(0,0,0,0.15)] transition-shadow"
-      >
-        <div className="relative aspect-[4/3] overflow-hidden">
-          <Image
-            src={`http://localhost:5000/images/${encodeURIComponent(favrecipe.coverImage)}`}
-            alt={favrecipe.title}
-            fill
-            unoptimized
-            className="h-full w-full object-cover"
-            loading="eager"
-          />
-          <span className="absolute top-3 left-3 text-[11px] font-semibold text-stone-800 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full">
-            {favrecipe.category}
-          </span>
-          <button
-            onClick={() => handleRemove(favrecipe._id)}
-            title={t("favorites.removeFromFavorites")}
-            className="absolute top-3 right-3 w-8 h-8 rounded-full backdrop-blur flex items-center justify-center text-[white] hover:bg-white/90 hover:text-orange-300 bg-red-500  transition-colors"
-          >
-            <Heart size={14} className="fill-current" />
-          </button>
-        </div>
-
-        <div className="p-4">
-          <h3
-            className="text-[16px] text-stone-900 mb-2 truncate"
-            style={{ fontFamily: "'Fraunces', serif" }}
-          >
-            {favrecipe.title}
-          </h3>
-
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-stone-500">
-            <span className="inline-flex items-center gap-1">
-              <Clock size={12} /> {favrecipe.time}
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <Gauge size={12} /> {favrecipe.difficulty}
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <Star size={12} className="text-[#ffa71c] fill-[#ffa71c]" />
-              {favrecipe.rating}
-            </span>
-          </div>
-        </div>
-      </div>
-    );
-  });
-
   return (
     <div
-      className="min-h-screen w-full bg-[#f7f7f7] text-stone-900"
+      className="min-h-screen w-full bg-[#F6F2EA] text-stone-900"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
-      <div className="flex">
-        <div className="flex-1 min-w-0">
-          <main className="px-6 lg:px-10 py-8 max-w-6xl mx-auto">
-            <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
-              <div>
-                <h1
-                  className="text-[28px] text-stone-900"
-                  style={{ fontFamily: "'Fraunces', serif" }}
-                >
-                  {t("favorites.title")}
-                </h1>
-                <p className="text-stone-500 text-[14px] mt-1">
-                  {favorateRecipe.length > 0
-                    ? t("favorites.savedRecipes", {
-                        count: favorateRecipe.length,
-                      })
-                    : t("favorites.emptyMessage")}
-                </p>
-              </div>
-            </div>
+      <style>{`@keyframes favIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}.fav-in{animation:favIn .55s cubic-bezier(.2,.7,.2,1) both}`}</style>
 
-            {favorateRecipe.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {showFavorate}
-              </div>
-            ) : load == true ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <SkeletonCard key={i} />
-                ))}
-              </div>
-            ) : (
-              <EmptyState />
-            )}
-          </main>
-        </div>
-      </div>
+      <main className="mx-auto max-w-6xl px-6 py-10 lg:px-10">
+        <header className="mb-10 flex flex-wrap items-end justify-between gap-4 border-b border-stone-200 pb-8">
+          <div>
+            <h1
+              className="text-[40px] leading-none text-stone-900 sm:text-[52px]"
+              style={{ fontFamily: "'Fraunces', serif", fontWeight: 500 }}
+            >
+              {t("favorites.title")}
+            </h1>
+            <p className="mt-3 text-[14px] text-stone-500">
+              {favorites.length > 0
+                ? t("favorites.savedRecipes", { count: favorites.length })
+                : t("favorites.emptyMessage")}
+            </p>
+          </div>
+          {favorites.length > 0 && (
+            <span
+              className="flex h-16 min-w-16 items-center justify-center rounded-full bg-stone-900 px-5 text-[28px] text-[#ffa71c]"
+              style={{ fontFamily: "'Fraunces', serif" }}
+            >
+              {favorites.length}
+            </span>
+          )}
+        </header>
+
+        {loading ? (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
+        ) : favorites.length > 0 ? (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {favorites.map((recipe, i) => (
+              <FavoriteCard
+                key={recipe._id}
+                recipe={recipe}
+                index={i}
+                removing={removingId === recipe._id}
+                onRemove={handleRemove}
+              />
+            ))}
+          </div>
+        ) : (
+          <EmptyState />
+        )}
+      </main>
     </div>
   );
 }
