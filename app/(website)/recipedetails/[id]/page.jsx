@@ -17,6 +17,8 @@ import axios from "axios";
 import Image from "next/image";
 import { t, useI18n } from "@/app/il8n";
 import { toast } from "@/components/ui/toast";
+import { SkeletonCard } from "@/app/skeleton/SkeletonCard";
+import { SkeletonRecipeDetials } from "@/app/skeleton/SkeletonRecipeDetials";
 
 /* ───────── helpers (مبنية على الـ schema) ───────── */
 const LEVELS = { easy: 1, سهل: 1, medium: 2, متوسط: 2, hard: 3, صعب: 3 };
@@ -97,16 +99,6 @@ function StarRating({ value, onChange, size = 18, interactive = false }) {
           </button>
         );
       })}
-    </div>
-  );
-}
-
-function Skeleton() {
-  return (
-    <div className="mx-auto max-w-6xl animate-pulse px-5 py-10 sm:px-8">
-      <div className="aspect-[21/9] w-full rounded-[32px] bg-stone-200" />
-      <div className="mx-10 -mt-8 h-20 rounded-2xl bg-stone-100" />
-      <div className="mt-10 h-40 rounded-2xl bg-stone-200/60" />
     </div>
   );
 }
@@ -197,7 +189,7 @@ export default function RecipeDetailsPage() {
     return (
       <div className="py-32 text-center text-stone-500">Recipe not found.</div>
     );
-  if (!recipe) return <Skeleton />;
+  if (!recipe) return <SkeletonRecipeDetials />;
 
   const level = LEVELS[String(recipe.difficulty).trim().toLowerCase()] ?? 2;
   const gallery = recipe.images || [];
@@ -307,7 +299,6 @@ export default function RecipeDetailsPage() {
         <div className="mb-16 mt-12 grid grid-cols-1 gap-10 lg:grid-cols-3">
           <div className="space-y-12 lg:col-span-2">
             <section className="fu" style={{ animationDelay: ".2s" }}>
-              <SectionTitle>{t("recipeDetails.about")}</SectionTitle>
               <p className="text-[15.5px] leading-[1.8] text-stone-600 first-letter:float-start first-letter:me-2 first-letter:text-[52px] first-letter:leading-[0.9] first-letter:text-stone-900">
                 {recipe.description}
               </p>
@@ -315,11 +306,6 @@ export default function RecipeDetailsPage() {
 
             {gallery.length > 0 && (
               <section className="fu" style={{ animationDelay: ".26s" }}>
-                <SectionTitle
-                  icon={<Images size={18} className="text-stone-400" />}
-                >
-                  Gallery
-                </SectionTitle>
                 <div
                   className={`grid gap-3 ${gallery.length === 1 ? "grid-cols-1" : gallery.length % 3 === 0 ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2"}`}
                 >
@@ -342,7 +328,6 @@ export default function RecipeDetailsPage() {
             )}
 
             <section className="fu" style={{ animationDelay: ".32s" }}>
-              <SectionTitle>{t("recipeDetails.instructions")}</SectionTitle>
               <ol className="relative space-y-7">
                 <span className="absolute bottom-3 start-[19px] top-3 w-px bg-stone-300/70" />
                 {steps.map((step, i) => (
@@ -531,17 +516,5 @@ function Stat({ label, icon, children }) {
         <span>{children}</span>
       </div>
     </div>
-  );
-}
-
-function SectionTitle({ children, icon }) {
-  return (
-    <h2
-      className="mb-4 flex items-center gap-2 text-[26px] text-stone-900"
-      style={{ fontFamily: "'Fraunces', serif", fontWeight: 500 }}
-    >
-      {children}
-      {icon}
-    </h2>
   );
 }
