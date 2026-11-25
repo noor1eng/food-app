@@ -27,7 +27,7 @@ import axios from "axios";
 import Image from "next/image";
 import { useAuth } from "@/app/context/token";
 import { SkeletonCard } from "@/app/skeleton/SkeletonCard";
-import { t } from "@/app/il8n";
+import { t, useI18n } from "@/app/il8n";
 
 /* ───────── helpers ───────── */
 // يستعمل الترجمة إذا المفتاح موجود، وإلا النص الافتراضي (ضيف المفاتيح landing.* لملف الترجمة بوقتها)
@@ -43,10 +43,12 @@ const U = (id) =>
 
 const formatTime = (m) => {
   const n = Number(m) || 0;
-  if (n < 60) return `${n} min`;
+  if (n < 60) return `${n} ${t("common.minuteShort")}`;
   const h = Math.floor(n / 60);
   const r = n % 60;
-  return r ? `${h}h ${r}m` : `${h}h`;
+  return r
+    ? `${h}${t("common.hourShort")} ${r} ${t("common.minuteShort")}`
+    : `${h}${t("common.hourShort")}`;
 };
 const countIngredients = (s) =>
   String(s || "")
@@ -89,28 +91,32 @@ const CATEGORIES = [
 const LESSONS = [
   {
     id: "photo-1621996346565-e3dbc353d2e5",
-    title: "Silky sauces from scratch",
+    titleKey: "landing.lessonSauces",
     cls: "col-span-2 row-span-2",
   },
   {
     id: "photo-1540420773420-3366772f4999",
-    title: "Fresh & raw basics",
+    titleKey: "landing.lessonFresh",
     cls: "",
   },
   {
     id: "photo-1467003909585-2f8a72700288",
-    title: "Sear, don't stress",
+    titleKey: "landing.lessonSear",
     cls: "row-span-2",
   },
-  { id: "photo-1583224964978-2257b960c3d6", title: "Ferment at home", cls: "" },
+  {
+    id: "photo-1583224964978-2257b960c3d6",
+    titleKey: "landing.lessonFerment",
+    cls: "",
+  },
   {
     id: "photo-1567620905732-2d1ec7ab7445",
-    title: "Breakfast fundamentals",
+    titleKey: "landing.lessonBreakfast",
     cls: "col-span-2",
   },
   {
     id: "photo-1585032226651-759b368d7246",
-    title: "Wok in ten minutes",
+    titleKey: "landing.lessonWok",
     cls: "col-span-2",
   },
 ];
@@ -240,12 +246,14 @@ function LearnMosaic() {
       </Reveal>
 
       <div className="grid auto-rows-[150px] grid-cols-2 gap-3 sm:auto-rows-[190px] md:grid-cols-4 md:gap-4">
-        {LESSONS.map((l, i) => (
-          <Reveal key={l.id} delay={i * 70} className={`${l.cls} min-h-0`}>
+        {LESSONS.map((l, i) => {
+          const title = t(l.titleKey);
+          return (
+            <Reveal key={l.id} delay={i * 70} className={`${l.cls} min-h-0`}>
             <figure className="group relative h-full w-full overflow-hidden rounded-[24px] bg-stone-200">
               <Image
                 src={U(l.id)}
-                alt={l.title}
+                alt={title}
                 fill
                 unoptimized
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -260,12 +268,13 @@ function LearnMosaic() {
                   className="text-[15px] leading-tight text-white sm:text-[17px]"
                   style={{ fontFamily: "'Fraunces', serif" }}
                 >
-                  {l.title}
+                  {title}
                 </p>
               </figcaption>
             </figure>
-          </Reveal>
-        ))}
+            </Reveal>
+          );
+        })}
       </div>
     </section>
   );
@@ -344,6 +353,12 @@ function HowItWorks() {
 /* ───────── Recipe card ───────── */
 function RecipeCard({ recipe }) {
   const level = LEVELS[String(recipe.difficulty).trim().toLowerCase()] ?? 2;
+  const difficultyKey = [
+    "",
+    "recipeForm.essentials.easy",
+    "recipeForm.essentials.medium",
+    "recipeForm.essentials.hard",
+  ][level];
   const categoryName = recipe.category?.name;
   const photos = recipe.images?.length || 0;
   return (
@@ -407,13 +422,15 @@ function RecipeCard({ recipe }) {
               ))}
             </div>
             <span className="text-[12px] font-semibold capitalize text-stone-800">
-              {recipe.difficulty}
+              {t(difficultyKey)}
             </span>
           </div>
           <div className="flex flex-col items-center gap-0.5">
             <ListChecks size={14} className="text-stone-400" />
             <span className="text-[12px] font-semibold text-stone-800">
-              {countIngredients(recipe.ingrediaint)} items
+              {t("home.ingredientsCount", {
+                count: countIngredients(recipe.ingrediaint),
+              })}
             </span>
           </div>
         </div>
@@ -435,6 +452,7 @@ function RecipeCard({ recipe }) {
 
 /* ───────── Page ───────── */
 export default function Hero() {
+  const { language } = useI18n();
   const [active, setActive] = useState("all");
   const [recipes, setRecipes] = useState([]);
   const [load, setLoad] = useState(true);
@@ -457,6 +475,7 @@ export default function Hero() {
       <Navbar />
       <div
         className="w-full bg-[#F6F2EA]"
+        dir={language === "ar" ? "rtl" : "ltr"}
         style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
       >
         <main className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
@@ -484,18 +503,18 @@ export default function Hero() {
                 </button>
               </Link>
             </div>
-            <div className="absolute bottom-0 right-0 top-0 w-[55%] sm:block">
+            <div className="absolute bottom-0 end-0 top-0 w-[55%] sm:block">
               <Image
                 src={"/photo-1467003909585-2f8a72700288[1]jpg.jpg"}
-                alt="Seared tuna salad"
+                alt={t("landing.heroImageAlt")}
                 className="h-full w-full object-cover"
                 width={480}
                 height={0}
                 style={{
                   maskImage:
-                    "linear-gradient(to right, transparent, black 15%)",
+                    `linear-gradient(to ${language === "ar" ? "left" : "right"}, transparent, black 15%)`,
                   WebkitMaskImage:
-                    "linear-gradient(to right, transparent, black 15%)",
+                    `linear-gradient(to ${language === "ar" ? "left" : "right"}, transparent, black 15%)`,
                 }}
               />
             </div>

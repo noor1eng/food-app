@@ -16,7 +16,6 @@ import { SkeletonCard } from "@/app/skeleton/SkeletonCard";
 import { toast } from "@/components/ui/toast";
 export default function FavoriteClient({ favorites }) {
   const [isPending, startTransition] = useTransition();
-  console.log(favorites);
 
   const LEVELS = { easy: 1, سهل: 1, medium: 2, متوسط: 2, hard: 3, صعب: 3 };
   const LEVEL_COLOR = ["", "bg-emerald-500", "bg-amber-500", "bg-rose-500"];
@@ -33,7 +32,7 @@ export default function FavoriteClient({ favorites }) {
     try {
       await axios.patch(`http://localhost:5000/api/v1/recipe/${id}/favorate`);
       setTimeout(() => {
-        favorites((prev) => prev.filter((r) => r._id !== id));
+        favorites.filter((prev) => prev._id !== id);
       }, 300);
       toast.add({
         title: "removed from favorate",

@@ -22,7 +22,40 @@
     "viewAllRecipes": "View All Recipes",
     "recipesFound": "{{count}} recipes found",
     "noRecipes": "No recipes to show",
-    "noRecipesDescription": "There's nothing here yet. Recipes you add will show up in this list."
+    "noRecipesDescription": "There's nothing here yet. Recipes you add will show up in this list.",
+    "ingredientsCount": "{{count}} items"
+  },
+
+  "landing": {
+    "eyebrow": "About Flavoriz",
+    "headline1": "A kitchen school,",
+    "headline2": "disguised as a recipe book.",
+    "intro": "Flavoriz is where home cooks learn by doing. Every recipe is broken into clear steps, with the time, the difficulty and the exact ingredients up front, so you always know what you're getting into before you turn on the stove.",
+    "f1Title": "Step-by-step recipes",
+    "f1Text": "Ingredients you can tick off and numbered steps you can follow without guessing.",
+    "f2Title": "Your own cookbook",
+    "f2Text": "Save what you love in one tap and come back to it any time.",
+    "f3Title": "Cook, then share",
+    "f3Text": "Add your own recipes with photos and let others rate them.",
+    "learnEyebrow": "Learn by cooking",
+    "learnTitle": "Six skills worth mastering",
+    "learnText": "From a first sauce to a weeknight stir-fry, each dish teaches one technique you'll use forever.",
+    "lesson": "Lesson",
+    "lessonSauces": "Silky sauces from scratch",
+    "lessonFresh": "Fresh & raw basics",
+    "lessonSear": "Sear, don't stress",
+    "lessonFerment": "Ferment at home",
+    "lessonBreakfast": "Breakfast fundamentals",
+    "lessonWok": "Wok in ten minutes",
+    "s1Title": "Pick a recipe",
+    "s1Text": "Browse by category and check the time and difficulty at a glance.",
+    "s2Title": "Cook along",
+    "s2Text": "Tick off ingredients as you go and follow every step in order.",
+    "s3Title": "Save & share",
+    "s3Text": "Keep your favorites close and publish your own creations.",
+    "howEyebrow": "How it works",
+    "howTitle": "From craving to plate in three steps",
+    "heroImageAlt": "Seared tuna salad"
   },
 
   "recipes": {
@@ -50,7 +83,14 @@
     "emptyDescription": "Recipes you save will show up here. Start exploring and tap the heart icon on any recipe you love.",
     "emptyMessage": "Recipes you love, all in one place",
     "browseRecipes": "Browse Recipes",
-    "removeFromFavorites": "Remove from favorites"
+    "removeFromFavorites": "Remove from favorites",
+    "toggleFavorite": "Toggle favorite",
+    "addedTitle": "Added to favorites",
+    "addedDescription": "Your recipe has been added to favorites.",
+    "removedTitle": "Removed from favorites",
+    "removedDescription": "Your recipe has been removed from favorites.",
+    "updateFailedTitle": "Favorite update failed",
+    "updateFailedDescription": "Unable to update this favorite. Please try again."
   },
 
   "auth": {
@@ -114,7 +154,9 @@
     "back": "Back",
     "search": "Search",
     "published": "Published",
-    "draft": "Draft"
+    "draft": "Draft",
+    "minuteShort": "min",
+    "hourShort": "h"
   },
 
   "dashboard": {
@@ -230,4 +272,5 @@
     "views": "Views",
     "helpful": "Helpful"
   }
+  
 }

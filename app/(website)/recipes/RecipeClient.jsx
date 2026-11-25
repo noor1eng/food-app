@@ -29,7 +29,8 @@ export default function RecipesClient({
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [active, setActive] = useState(activeCategory || "");
-  const [saved, setSaved] = useState("unsaved");
+  const [favoriteStates, setFavoriteStates] = useState({});
+  const [pendingFavoriteIds, setPendingFavoriteIds] = useState(new Set());
 
   const LEVELS = { easy: 1, سهل: 1, medium: 2, متوسط: 2, hard: 3, صعب: 3 };
   const LEVEL_COLOR = ["", "bg-emerald-500", "bg-amber-500", "bg-rose-500"];
@@ -53,23 +54,39 @@ export default function RecipesClient({
   }
 
   async function handleEditFavorate(id) {
+    if (pendingFavoriteIds.has(id)) return;
+    setPendingFavoriteIds((current) => new Set(current).add(id));
+
     try {
-      await axios
-        .put(`http://localhost:5000/api/v1/recipe/${id}/favorate`)
-        .then((res) => {
-          setSaved(res.data.favorate ? "saved" : "unsaved");
-        });
+      const res = await axios.put(
+        `http://localhost:5000/api/v1/recipe/${id}/favorate`,
+      );
+      const isFavorited = Boolean(res.data.favorate);
+      setFavoriteStates((current) => ({ ...current, [id]: isFavorited }));
       toast.add({
-        title: saved == "saved" ? "added to favorate" : "removed from favorate",
-        description:
-          saved == "saved"
-            ? "Your recipe has been added to favorate"
-            : "Your recipe has been removed from favorate",
+        title: isFavorited
+          ? t("favorites.addedTitle")
+          : t("favorites.removedTitle"),
+        description: isFavorited
+          ? t("favorites.addedDescription")
+          : t("favorites.removedDescription"),
         type: "success",
         timeout: 2000,
       });
     } catch (err) {
-      console.log(err);
+      console.error("Failed to update favorite:", err);
+      toast.add({
+        title: t("favorites.updateFailedTitle"),
+        description: t("favorites.updateFailedDescription"),
+        type: "error",
+        timeout: 2000,
+      });
+    } finally {
+      setPendingFavoriteIds((current) => {
+        const next = new Set(current);
+        next.delete(id);
+        return next;
+      });
     }
   }
 
@@ -96,6 +113,9 @@ export default function RecipesClient({
 
   const showRecipes = recipes.map((recipe) => {
     const level = LEVELS[String(recipe.difficulty).trim().toLowerCase()] ?? 2;
+    const isFavorited =
+      favoriteStates[recipe._id] ?? Boolean(recipe.favorate);
+    const isFavoritePending = pendingFavoriteIds.has(recipe._id);
     const categoryName = recipe.category?.name;
     return (
       <article
@@ -124,17 +144,19 @@ export default function RecipesClient({
           <button
             onClick={() => handleEditFavorate(recipe._id)}
             type="button"
-            aria-label="favorite"
-            aria-pressed={recipe.favorate}
+            aria-label={t("favorites.toggleFavorite")}
+            aria-pressed={isFavorited}
+            aria-busy={isFavoritePending}
+            disabled={isFavoritePending}
             className={`absolute end-4 top-4 flex h-9 w-9 items-center justify-center rounded-full backdrop-blur transition-colors ${
-              recipe.favorate == true && saved == "saved"
+              isFavorited
                 ? "bg-red-500 text-white "
                 : "bg-white text-stone-700 hover:bg-red-500 hover:text-white"
             }`}
           >
             <Heart
               size={16}
-              className={recipe.favorate ? "fill-white" : "fill-white"}
+              className={isFavorited ? "fill-current" : "fill-none"}
             />
           </button>
 
