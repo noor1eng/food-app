@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Navbar from "../Navbar";
 
 // @next-codemod-ignore Cache Components adoption: this segment temporarily allows blocking.
@@ -8,7 +9,10 @@ export const instant = false;
 export default function websiteLayout({ children }) {
   return (
     <>
-      <Navbar />
+      {/* Navbar reads usePathname(), which is dynamic on routes like /recipedetails/[id] */}
+      <Suspense fallback={<div className="h-16" />}>
+        <Navbar />
+      </Suspense>
       {children}
     </>
   );
